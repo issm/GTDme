@@ -1,0 +1,29 @@
+: cascade _base
+
+
+: around css_additional -> {}
+
+
+: around css_additional -> {
+<script type="text/javascript" src="<: uri_for('/static/js/p/top/index.js') :>"></script>
+: }
+
+
+: around content -> {
+<h1>
+  Home
+: if defined $tag {
+  / <: $tag :>
+: }
+</h1>
+
+
+: include _inc::items {
+:   disable_menu    => { action => 1 },
+:   enable_sortable => 1,
+:   path_format     => { tag => '/home/t/%s' },
+: }
+
+
+
+: }

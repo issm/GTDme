@@ -6,9 +6,11 @@ use lib File::Spec->catdir(dirname(__FILE__), 'extlib', 'lib', 'perl5');
 use lib File::Spec->catdir(dirname(__FILE__), 'lib');
 use Plack::Builder;
 
-use GTDme::Admin;
+use GTDme::API;
 use Plack::App::File;
+use Plack::Util;
 use Plack::Session::Store::DBI;
+use Plack::Session::State::Cookie;
 use DBI;
 
 my $basedir = File::Spec->rel2abs(dirname(__FILE__));
@@ -18,11 +20,9 @@ my $db_config = GTDme->config->{DBI} || die "Missing configuration for DBI";
     $c->setup_schema();
 }
 builder {
-    enable 'Plack::Middleware::Auth::Basic',
-        authenticator => sub { $_[0] eq 'admin' && $_[1] eq 'admin' };
     enable 'Plack::Middleware::Static',
         path => qr{^(?:/robots\.txt|/favicon\.ico)$},
-        root => File::Spec->catdir(dirname(__FILE__), 'static', 'admin');
+        root => File::Spec->catdir(dirname(__FILE__), 'static', 'api');
     enable 'Plack::Middleware::ReverseProxy';
     enable 'Plack::Middleware::Log::Minimal';
     enable 'Plack::Middleware::Session',
@@ -31,8 +31,11 @@ builder {
                 DBI->connect( @$db_config )
                     or die $DBI::errstr;
             }
+        ),
+        state => Plack::Session::State::Cookie->new(
+            httponly => 1,
         );
 
-    mount '/static/' => Plack::App::File->new(root => File::Spec->catdir($basedir, 'static', 'admin'));
-    mount '/' => GTDme::Admin->to_app();
+    mount '/static/' => Plack::App::File->new(root => File::Spec->catdir($basedir, 'static', 'api'));
+    mount '/' => GTDme::API->to_app();
 };

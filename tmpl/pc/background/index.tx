@@ -1,0 +1,20 @@
+: cascade _base
+
+
+: around content -> {
+<h1>
+  Background
+: if defined $tag {
+  / <: $tag :>
+: }
+</h1>
+
+
+: include _inc::items {
+:   disable_menu    => { background => 1 },
+:   enable_sortable => 1,
+:   path_format     => { tag => '/background/t/%s' },
+: }
+
+
+: }

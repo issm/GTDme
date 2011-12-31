@@ -1,0 +1,16 @@
+/**
+ *
+ *  #inbox-form
+ *
+ **/
+#inbox-form {
+    margin: 0;
+    padding: 4px 12px;
+    border: 2px solid #666;
+    border-radius: 6px;
+    background: #e8e8e8;
+}
+
+#inbox-form form .textbox {
+    width: 99%;
+}

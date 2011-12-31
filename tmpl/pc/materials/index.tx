@@ -1,0 +1,21 @@
+: cascade _base
+
+
+: around content -> {
+<h1>
+  Materials
+: if defined $tag {
+  / <: $tag :>
+: }
+</h1>
+
+
+: include _inc::items {
+:   disable_menu    => { material => 1 },
+:   enable_sortable => 1,
+:   path_format     => { tag => '/materials/t/%s' },
+: }
+
+
+
+: }

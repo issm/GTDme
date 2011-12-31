@@ -1,0 +1,43 @@
+: cascade _base
+
+
+: around css_additional -> {
+<link href="<: static_file('/static/css/p/inbox/index.css') :>" rel="stylesheet" type="text/css" media="screen" />
+: }
+
+
+: around js_additional -> {
+<script type="text/javascript" src="<: uri_for('/static/js/p/inbox/index.js') :>"></script>
+: }
+
+
+: around content -> {
+
+
+<h1>
+  Inbox
+: if defined $tag {
+  / <: $tag :>
+: }
+</h1>
+
+
+: include _inc::items {
+:   enable_menu => { do_now => 1 },
+:   path_format  => { tag => '/inbox/t/%s' },
+: }
+
+
+
+: # <!-- #infox-form -->
+<div class="span160" id="inbox-form">
+  <h3>Add to Inbox?</h3>
+  <form>
+    <input type="text" name="content" class="textbox" />
+  </form>
+</div>
+: # <!-- /#infox-form -->
+
+
+
+: }

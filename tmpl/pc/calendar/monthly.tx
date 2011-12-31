@@ -1,0 +1,20 @@
+: cascade _base
+
+
+: around content -> {
+<h1>
+  Calendar / Monthly
+: if defined $tag {
+  / <: $tag :>
+: }
+</h1>
+
+
+: include _inc::items {
+:   disable_menu => { calendar => 1 },
+:   path_format  => { tag => '/calendar/monthly/t/%s' },
+: }
+
+
+
+: }

@@ -1,0 +1,11 @@
+body {
+}
+
+
+.textbox {
+    color: #484848;
+    background-color: #f0f0f0;
+}
+.textbox:focus {
+    background-color: #fff0bb;
+}

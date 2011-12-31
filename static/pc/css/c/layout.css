@@ -1,0 +1,71 @@
+body {
+    position: relative;
+}
+
+
+
+
+#inbox-always {
+    margin: 0;
+    padding: 10px 20px;
+    border: 2px solid #666;
+    border-radius: 6px;
+    position: fixed;
+    z-index: 100000;
+    top: 160px;
+    right: 0;
+    display: none;
+    width: 896px;
+    box-shadow: 0px 0px 24px #999;
+    background: #e8e8e8;
+}
+
+#inbox-always form {
+    margin: 0;
+    padding: 0;
+}
+
+#inbox-always form .textbox {
+    padding: 3px 5px;
+    width: 886px;
+}
+
+
+#inbox-always form .actions {
+    margin: 0;
+    padding: 10px;
+    text-align: center;
+    background: none;
+}
+
+#inbox-always form .actions a.btn {
+    margin: 0 5px;
+}
+
+
+
+#inbox-always-toggle {
+    padding: 3px;
+    border: 2px solid #666;
+    border-right: none;
+    border-top-left-radius:    6px;
+    border-bottom-left-radius: 6px;
+    position: fixed;
+    z-index: 99990;
+    top: 160px;
+    right: 0;
+    width: 48px;
+    height: 48px;
+    box-shadow: 0px 0px 12px #999;
+    background: #e8e8e8;
+}
+
+#inbox-always-toggle a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+}
+#inbox-always-toggle a span {
+    visibility: hidden;
+}

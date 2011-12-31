@@ -1,0 +1,21 @@
+: cascade _base
+
+
+: around content -> {
+<h1>
+  Someday
+: if defined $tag {
+  / <: $tag :>
+: }
+</h1>
+
+
+: include _inc::items {
+:   disable_menu    => { someday => 1 },
+:   enable_sortable => 1,
+:   path_format     => { tag => '/someday/t/%s' },
+: }
+
+
+
+: }

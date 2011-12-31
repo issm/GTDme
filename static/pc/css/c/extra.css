@@ -1,0 +1,238 @@
+/**
+ *
+ *  #items 
+ *
+ **/
+#items {
+    margin-bottom: 20px;
+}
+
+#items > ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#items > ul > li {
+    margin: 0 0 8px 0;
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    position: relative;
+    color: #484848;
+    background-color: #f8f8f8;
+}
+
+#items > ul > li:hover {
+    margin: -1px -1px 7px -1px;
+    border-width: 2px;
+    border-color: #ababab;
+    background-color: #eaffb0;
+}
+#items > ul > li:last-child:hover {
+    margin: -1px -1px -1px -1px;
+}
+
+#items > ul > li.sortable_placeholder {
+    border: 2px dashed #f8abab;
+    height: auto;
+    background-color: #ffd8e9;
+}
+
+#items ul li .main {
+    padding: 4px;
+    /* width: 33%; */
+    /* float: left; */
+}
+
+
+#items ul li .main .options {
+    margin: 4px 0 4px 0;
+    color: #999;
+    font-size: 90%;
+}
+#items ul li .main .options .datetime_start,
+#items ul li .main .options .datetime_end,
+#items ul li .main .options .wday,
+#items ul li .main .options .mday,
+#items ul li .main .options .mwday {
+    color: #ff6789;
+    font-size: 110%;
+    font-weight: bolder;
+}
+#items ul li .main .options .datetime,
+#items ul li .main .options .wday,
+#items ul li .main .options .mday,
+#items ul li .main .options .mwday {
+    margin-right: 1em;
+}
+
+#items ul li .main .options .tags {
+}
+
+#items ul li .main .options .tags .tag {
+    margin: 0 1px;
+}
+#items ul li .main .options .tags .tag a {
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #fff;
+    background: #6a88ff;
+}
+#items ul li .main .options .tags .tag a:hover {
+    background: #6ac8ff;
+    text-decoration: none;
+}
+
+
+
+#items ul li .main .content {
+}
+
+#items ul li .main .editor {
+    display: none;
+}
+#items ul li .main .editor .textbox {
+    width: 99%;
+}
+#items ul li .main .editor .actions {
+    margin: 5px 0 0 0;
+    padding: 0;
+    border: none;
+    background: none;
+    text-align: right;
+}
+#items ul li .main .editor .actions a.btn {
+    margin-left: 5px;
+}
+
+
+#items ul li .main .steps {
+    margin: 4px 0 4px 0;
+    color: #999;
+    font-size: 90%;
+}
+#items ul li .main .steps .rate_attain {
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    float: left;
+    width: 50%;
+    height: 5px;
+    background-color: #f0f0f0;
+}
+#items ul li .main .steps .rate_attain .rate_attain_content {
+    border-radius: 3px;
+    width: auto;
+    height: 100%;
+    background-color: #18d020
+}
+
+#items ul li .main .steps .frac {
+    margin-left: 10px;
+    float: left;
+}
+#items ul li .main .steps .frac .step {
+}
+#items ul li .main .steps .frac .step_attain {
+    font-weight: bolder;
+}
+#items ul li .main .steps .frac .step_attain_active {
+    color: #ff6789;
+}
+
+#items ul li .main .steps .clear { clear: both }
+
+
+#items ul li .main .datetime {
+    margin-top: 4px;
+    color: #999;
+    font-size: 90%;
+}
+
+#items ul li .menu {
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    /* top: 4px; */
+    top: -24px;
+    right: 16px;
+}
+#items ul li:hover .menu {
+    display: block;
+}
+
+#items ul li .menu ul {
+    list-style: none;
+}
+
+#items ul li .menu ul li {
+    margin: 0 0 0 4px;
+    /* border: 1px solid #ababab; */
+    border-radius: 6px;
+    float: left;
+    width:  36px;
+    height: 32px;
+    overflow: hidden;
+    line-height: 100%;
+    box-shadow: 1px 1px 6px #484848;
+}
+
+#items ul li .menu ul li a {
+    padding: 2px;
+    border-radius: 6px;
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+}
+#items ul li .menu ul li.delivery  a { background-color: #ffc8a9 }
+#items ul li .menu ul li.operation a { background-color: #b9f8cc }
+
+#items ul li .menu ul li a:hover {
+    background-color: #ffd899;
+}
+#items ul li .menu ul li a span {
+}
+
+
+#items ul li .sort {
+    border-radius: 2px;
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    bottom: 0;
+    right: 0;
+    width: 48px;
+    height: 24px;
+    background: #c8c8c8;
+}
+#items ul li:hover .sort {
+    display: block;
+}
+#items ul li .sort a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    cursor: move;
+}
+#items ul li .sort a:hover {
+    background: #e3e3d3;
+}
+#items ul li .sort a span {
+}
+
+
+
+#items ul li .clear { clear: both }
+
+
+#items > ul > li.done          { background-color: #abd8ff }
+#items > ul > li.to_action     { background-color: #abd8ff }
+#items > ul > li.to_calendar   { background-color: #abd8ff }
+#items > ul > li.to_background { background-color: #abd8ff }
+#items > ul > li.to_material   { background-color: #abd8ff }
+#items > ul > li.to_project    { background-color: #abd8ff }
+#items > ul > li.to_someday    { background-color: #abd8ff }
+#items > ul > li.to_trash      { background-color: #ff6868 }

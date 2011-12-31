@@ -1,4 +1,4 @@
-package GTDme::PC;
+package GTDme::API;
 use strict;
 use warnings;
 use utf8;
@@ -6,9 +6,9 @@ use parent qw(GTDme Amon2::Web);
 use File::Spec;
 
 # dispatcher
-use GTDme::PC::Dispatcher;
+use GTDme::API::Dispatcher;
 sub dispatch {
-    return GTDme::PC::Dispatcher->dispatch($_[0]) or die "response is not generated";
+    return GTDme::API::Dispatcher->dispatch($_[0]) or die "response is not generated";
 }
 
 # setup view class
@@ -16,7 +16,7 @@ use Text::Xslate;
 {
     my $view_conf = __PACKAGE__->config->{'Text::Xslate'} || +{};
     unless (exists $view_conf->{path}) {
-        $view_conf->{path} = [ File::Spec->catdir(__PACKAGE__->base_dir(), 'tmpl/pc') ];
+        $view_conf->{path} = [ File::Spec->catdir(__PACKAGE__->base_dir(), 'tmpl/api') ];
     }
     my $view = Text::Xslate->new(+{
         'syntax'   => 'TTerse',
@@ -46,8 +46,7 @@ use Text::Xslate;
 
 # load plugins
 __PACKAGE__->load_plugins(
-    'Web::FillInFormLite',
-    'Web::CSRFDefender',
+    'Web::JSON',
 );
 
 sub show_error {
@@ -61,21 +60,35 @@ sub show_error {
 __PACKAGE__->add_trigger(
     BEFORE_DISPATCH => sub {
         my ($c) = @_;
+        my $req = $c->req;
+        my $apikey = $req->param('apikey');
+
+        my $m_user = $c->model('user');
         my $my;
-        if ( defined ( my $my_id = $c->session->get('my_id') ) ) {
-            my $m_user = $c->model('user');
+
+        # query param "apikey" is specified
+        if ( $apikey ) {
+            $my = $m_user->search( apikey => $apikey )->{list}[0];
+        }
+        # has logged in
+        elsif ( my $my_id = $c->session->get('my_id') ) {
             $my = $m_user->search( id => $my_id )->{list}[0];
         }
+
         unless ( defined $my ) {
-            $my = { id => 0 };
+            my $res = $c->render_json({ status => 403 });
+            $res->status(403);
+            return $res;
         }
+
         $c->stash->{my} = $my;
         $c->stash->{is_loggedin} = $my->{id} ? 1 : 0;
     },
 
-
     AFTER_DISPATCH => sub {
         my ( $c, $res ) = @_;
+
+        $res->header('Content-Type' => 'application/json; charset=utf-8' );
 
         # http://blogs.msdn.com/b/ie/archive/2008/07/02/ie8-security-part-v-comprehensive-protection.aspx
         $res->header( 'X-Content-Type-Options' => 'nosniff' );

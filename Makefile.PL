@@ -20,6 +20,14 @@ WriteMakefile(
         'String::CamelCase'               => '0.02',
         'Test::WWW::Mechanize::PSGI'      => '0',
         'Time::Piece'                     => '1.20',
+
+        'Plack::Middleware::Log::Minimal' => '0.06',
+        'Log::Minimal'                    => '0.09',
+
+        'Class::Accessor::Lite'           => '0.05',
+        'List::MoreUtils'                 => '0.33',
+        'Smart::Args'                     => '0.10',
+        'OAuth::Lite'                     => '1.31',
     },
     MIN_PERL_VERSION => '5.008001',
     (-d 'xt' and $ENV{AUTOMATED_TESTING} || $ENV{RELEASE_TESTING}) ? (

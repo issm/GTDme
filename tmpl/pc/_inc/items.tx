@@ -1,0 +1,246 @@
+<script type="text/javascript" src="<: uri_for('/static/js/lib/jarty.js') :>"></script>
+<script type="text/javascript" src="<: uri_for('/static/js/lib/jarty.date.js') :>"></script>
+
+
+: # <!-- #items -->
+<div class="span16" id="items">
+  <ul>
+: while $iterator_item.next() -> $i {
+    <li id="items-item:<: $i.item_id :>" class="">
+      <div class="clear-fix">
+        <div class="main">
+          <div class="options">
+:   if $i.option_t_start {
+            <span class="datetime">
+              <span class="datetime_start"><: $i.option_datetime_start :></span>
+:     if $i.option_t_end {
+              &nbsp;--&nbsp;
+              <span class="datetime_end"><: $i.option_datetime_end :></span>
+:     }
+            </span>
+:   }
+
+:   if $i.option_wday {
+            <span class="wday"><: $i.option_wday.wday_name() :></span>
+:   }
+
+:   if $i.option_mday {
+            <span class="mday"><: $i.option_mday :></span>
+:   }
+:   elsif $i.option_mwday {
+            <span class="mwday"><: $i.option_mwday.parse_mwday() :></span>
+:   }
+
+:   if $i.tag_names {
+            <span class="tags">
+:     for $i.tag_names.split('::') -> $tag_name {
+              <span class="tag">
+                <a href="<: uri_for( $path_format.tag.sprintf($tag_name) ) :>"><: $tag_name :></a>
+              </span>
+:     }
+            </span>
+:   }
+          </div>
+
+          <div class="content">
+            <: $i.content :>
+          </div>
+          <div class="editor">
+            <input type="text" name="content" class="textbox" />
+            <input type="hidden" name="raw_text" value="<: $i.raw_text :>" />
+            <div class="actions">
+              <a class="button-cancel btn small">Cancel</a>
+              <a class="button-submit btn small primary">Save</a>
+            </div>
+          </div>
+
+          <div class="steps">
+            <div class="rate_attain">
+              <div class="rate_attain_content" style="width:<: $i.rate_attain :>%"></div>
+            </div>
+            <div class="frac">
+              <span class="step"><: $i.step :></span>
+              /
+:   if $i.step_attain {
+              <span class="step_attain step_attain_active"><: $i.step_attain :></span>
+:   } else {
+              <span class="step_attain">-</span>
+:   }
+            </div>
+            <div class="clear"></div>
+          </div>
+        </div>
+
+        <div class="menu">
+          <ul>
+:   if ! $disable_menu.step {
+            <li class="operation"><a href="#/step/-1/<: $i.item_id :>">--</a></li>
+            <li class="operation"><a href="#/step/+1/<: $i.item_id :>">++</a></li>
+:   }
+
+:   if ! $disable_menu.done {
+            <li class="operation"><a href="#/done/<: $i.item_id :>">Done!</a></li>
+:   }
+
+:   if $enable_menu.do_now {
+            <li class="delivery "><a href="#/do_now/<: $i.item_id :>">Can do now!</a></li>
+:   }
+
+:   if ! $disable_menu.action {
+            <li class="delivery "><a href="#/deliver/action/<: $i.item_id :>">Next action</a></li>
+:   }
+:   if ! $disable_menu.calendar {
+            <li class="delivery "><a href="#/deliver/calendar/<: $i.item_id :>">Calendar</a></li>
+:   }
+:   if ! $disable_menu.material {
+            <li class="delivery "><a href="#/deliver/material/<: $i.item_id :>">Material</a></li>
+:   }
+:   if ! $disable_menu.background {
+            <li class="delivery "><a href="#/deliver/background/<: $i.item_id :>">Background</a></li>
+:   }
+:   if ! $disable_menu.someday {
+            <li class="delivery "><a href="#/deliver/someday/<: $i.item_id :>">Someday</a></li>
+:   }
+:   if ! $disable_menu.project {
+            <li class="delivery "><a href="#/deliver/project/<: $i.item_id :>">Project</a></li>
+:   }
+:   if ! $disable_menu.trash {
+            <li class="delivery "><a href="#/deliver/trash/<: $i.item_id :>">No need</a></li>
+:   }
+
+:   if ! $disable_menu.edit {
+            <li class="operation"><a href="#/edit/<: $i.item_id :>">Edit</a></li>
+:   }
+          </ul>
+        </div>
+
+:   if $enable_sortable {
+        <div class="sort">
+          <a href="#/sort/<: $i.item_id :>"><span>Sort</span></a>
+        </div>
+:   }
+        <div class="clear"></div>
+      </div>
+    </li>
+: }
+  </ul>
+</div>
+: # <!-- /#items -->
+
+
+
+:# <!-- #jarty:items-item -->
+<script id="jarty:items-item" type="text/jarty">
+{* <![CDATA[ *}
+<li id="items-item:{$i.item_id}">
+  <div class="clear-fix">
+    <div class="main">
+      <div class="options">
+{if $i.option_t_start > 0}
+        <span class="datetime">
+          <span class="datetime_start">{$i.option_datetime_start}</span>
+{  if $i.option_t_end > 0}
+          &nbsp;--&nbsp;
+          <span class="datetime_end">{$i.option_datetime_end}</span>
+{  /if}
+        </span>
+{/if}
+
+{if $i.option_wday > 0}
+        <span class="wday">{$i.option_wday_name}</span>
+{/if}
+
+{if $i.option_mday > 0}
+        <span class="mday">{$i.option_mday}</span>
+{elseif $i.option_mwday > 0}
+        <span class="mwday">{$i.option_mwday_name}</span>
+{/if}
+
+{if $i.tag_names != ''}
+        <span class="tags">
+{  foreach item=tag_name from=$i.tag_names|split}
+          <span class="tag">
+            <a href="<: uri_for( $path_format.tag.sprintf('{$tag_name}') ) :>">{$tag_name}</a>
+          </span>
+{  /foreach}
+        </span>
+{/if}
+</div>
+
+      <div class="content">
+        {$i.content}
+      </div>
+      <div class="editor">
+        <input type="text" name="content" class="textbox" />
+        <input type="hidden" name="raw_text" value="{$i.raw_text}" />
+        <div class="actions">
+          <a class="button-cancel btn small">Cancel</a>
+          <a class="button-submit btn small primary">Save</a>
+        </div>
+      </div>
+
+      <div class="steps">
+        <div class="rate_attain">
+          <div class="rate_attain_content" style="width:{$i.rate_attain}%"></div>
+        </div>
+        <div class="frac">
+          <span class="step">{$i.step}</span>
+          /
+{if $i.step_attain > 0}
+          <span class="step_attain step_attain_active">{$i.step_attain}</span>
+{else}
+          <span class="step_attain">-</span>
+{/if}
+        </div>
+        <div class="clear"></div>
+      </div>
+    </div>
+
+    <div class="menu">
+      <ul>
+:   if ! $disable_menu.step {
+        <li class="operation"><a href="#/step/-1/{$i.item_id}">--</a></li>
+        <li class="operation"><a href="#/step/+1/{$i.item_id}">++</a></li>
+:   }
+
+:   if ! $disable_menu.done {
+        <li class="delivery "><a href="#/done/{$i.item_id}">Done!</a></li>
+:   }
+
+:   if $enable_menu.do_now {
+        <li class="delivery "><a href="#/do_now/{$i.item_id}">Can do now!</a></li>
+:   }
+
+:   if ! $disable_menu.action {
+        <li class="delivery "><a href="#/deliver/action/{$i.item_id}">Next action</a></li>
+:   }
+:   if ! $disable_menu.calendar {
+        <li class="delivery "><a href="#/deliver/calendar/{$i.item_id}">Calendar</a></li>
+:   }
+:   if ! $disable_menu.material {
+        <li class="delivery "><a href="#/deliver/material/{$i.item_id}">Material</a></li>
+:   }
+:   if ! $disable_menu.background {
+        <li class="delivery "><a href="#/deliver/background/{$i.item_id}">Background</a></li>
+:   }
+:   if ! $disable_menu.someday {
+        <li class="delivery "><a href="#/deliver/someday/{$i.item_id}">Someday</a></li>
+:   }
+:   if ! $disable_menu.project {
+        <li class="delivery "><a href="#/deliver/project/{$i.item_id}">Project</a></li>
+:   }
+:   if ! $disable_menu.trash {
+        <li class="delivery "><a href="#/deliver/trash/{$i.item_id}">No need</a></li>
+:   }
+
+:   if ! $disable_menu.edit {
+        <li class="operation"><a href="#/edit/{$i.item_id}">Edit</a></li>
+:   }
+      </ul>
+    </div>
+    <div class="clear"></div>
+  </div>
+</li>
+{* ]]> *}
+</script>
+:# <!-- /#jarty:items-item -->
