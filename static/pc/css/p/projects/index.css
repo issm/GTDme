@@ -1,0 +1,270 @@
+/**
+ *
+ *  #projects 
+ *
+ **/
+#projects {
+    margin-bottom: 20px;
+}
+
+#projects > ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#projects > ul > li {
+    margin: 0 0 8px 0;
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    position: relative;
+    color: #484848;
+    background-color: #f8f8f8;
+}
+
+#projects > ul > li:hover {
+    margin: -1px -1px 7px -1px;
+    border-width: 2px;
+    border-color: #ababab;
+    background-color: #eaffb0;
+}
+#projects > ul > li:last-child:hover {
+    margin: -1px -1px -1px -1px;
+}
+
+#projects > ul > li.sortable_placeholder {
+    border: 2px dashed #f8abab;
+    height: auto;
+    background-color: #ffd8e9;
+}
+
+#projects ul li .main {
+    padding: 4px;
+    /* width: 33%; */
+    /* float: left; */
+}
+
+#projects ul li .main .name {
+    font-weight: bolder;
+}
+
+#projects ul li .main .code {
+    display: none;
+}
+
+#projects ul li .main .description {
+    margin-top: 4px;
+    color: #999;
+}
+
+#projects ul li .main .options {
+    margin: 4px 0 4px 0;
+    color: #999;
+    font-size: 90%;
+}
+#projects ul li .main .options .datetime_start,
+#projects ul li .main .options .datetime_end,
+#projects ul li .main .options .wday,
+#projects ul li .main .options .mday,
+#projects ul li .main .options .mwday {
+    color: #ff6789;
+    font-size: 110%;
+    font-weight: bolder;
+}
+#projects ul li .main .options .datetime,
+#projects ul li .main .options .wday,
+#projects ul li .main .options .mday,
+#projects ul li .main .options .mwday {
+    margin-right: 1em;
+}
+
+#projects ul li .main .options .tags {
+}
+
+#projects ul li .main .options .tags .tag {
+    margin: 0 1px;
+}
+#projects ul li .main .options .tags .tag a {
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #fff;
+    background: #6a88ff;
+}
+#projects ul li .main .options .tags .tag a:hover {
+    background: #6ac8ff;
+    text-decoration: none;
+}
+
+
+
+#projects ul li .main .content {
+}
+
+#projects ul li .main .editor {
+    margin-bottom: 24px;
+    display: none;
+}
+
+#projects ul li .main .editor form label {
+    margin-right: 8px;
+    width: 8%;
+}
+
+#projects ul li .main .editor form .clearfix {
+    margin-bottom: 8px;
+}
+
+#projects ul li .main .editor .textbox {
+}
+#projects ul li .main .editor .textbox-name {
+    width: 44%;
+}
+#projects ul li .main .editor .textbox-code {
+    width: 44%;
+}
+#projects ul li .main .editor .textbox-description {
+    width: 88%;
+}
+
+#projects ul li .main .editor .actions {
+    margin: 5px 0 0 0;
+    padding: 0;
+    border: none;
+    background: none;
+    text-align: right;
+}
+#projects ul li .main .editor .actions a.btn {
+    margin-left: 5px;
+}
+
+
+#projects ul li .main .steps {
+    margin: 4px 0 4px 0;
+    color: #999;
+    font-size: 90%;
+}
+#projects ul li .main .steps .rate_attain {
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    float: left;
+    width: 50%;
+    height: 5px;
+    background-color: #f0f0f0;
+}
+#projects ul li .main .steps .rate_attain .rate_attain_content {
+    border-radius: 3px;
+    width: auto;
+    height: 100%;
+    background-color: #18d020
+}
+
+#projects ul li .main .steps .frac {
+    margin-left: 10px;
+    float: left;
+}
+#projects ul li .main .steps .frac .step {
+}
+#projects ul li .main .steps .frac .step_attain {
+    font-weight: bolder;
+}
+#projects ul li .main .steps .frac .step_attain_active {
+    color: #ff6789;
+}
+
+#projects ul li .main .steps .clear { clear: both }
+
+
+#projects ul li .main .datetime {
+    margin-top: 4px;
+    color: #999;
+    font-size: 90%;
+}
+
+#projects ul li .menu {
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    /* top: 4px; */
+    top: -24px;
+    right: 16px;
+}
+#projects ul li:hover .menu {
+    display: block;
+}
+
+#projects ul li .menu ul {
+    list-style: none;
+}
+
+#projects ul li .menu ul li {
+    margin: 0 0 0 4px;
+    /* border: 1px solid #ababab; */
+    border-radius: 6px;
+    float: left;
+    width:  36px;
+    height: 32px;
+    overflow: hidden;
+    line-height: 100%;
+    box-shadow: 1px 1px 6px #484848;
+}
+
+#projects ul li .menu ul li a {
+    padding: 2px;
+    border-radius: 6px;
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+}
+#projects ul li .menu ul li.delivery  a { background-color: #ffc8a9 }
+#projects ul li .menu ul li.operation a { background-color: #b9f8cc }
+
+#projects ul li .menu ul li a:hover {
+    background-color: #ffd899;
+}
+#projects ul li .menu ul li a span {
+}
+
+
+#projects ul li .sort {
+    border-radius: 2px;
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    bottom: 0;
+    right: 0;
+    width: 48px;
+    height: 24px;
+    background: #c8c8c8;
+}
+#projects ul li:hover .sort {
+    display: block;
+}
+#projects ul li .sort a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    text-decoration: none;
+    cursor: move;
+}
+#projects ul li .sort a:hover {
+    background: #e3e3d3;
+}
+#projects ul li .sort a span {
+}
+
+
+
+#projects ul li .clear { clear: both }
+
+
+#projects > ul > li.done          { background-color: #abd8ff }
+#projects > ul > li.to_action     { background-color: #abd8ff }
+#projects > ul > li.to_calendar   { background-color: #abd8ff }
+#projects > ul > li.to_background { background-color: #abd8ff }
+#projects > ul > li.to_material   { background-color: #abd8ff }
+#projects > ul > li.to_project    { background-color: #abd8ff }
+#projects > ul > li.to_someday    { background-color: #abd8ff }
+#projects > ul > li.to_trash      { background-color: #ff6868 }

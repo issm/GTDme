@@ -31,7 +31,13 @@
             <span class="mwday"><: $i.option_mwday.parse_mwday() :></span>
 :   }
 
-:   if $i.tag_names {
+:   if defined $i.project_name  &&  defined $path_format.project {
+            <span class="project_name">
+              <a href="<: uri_for( $path_format.project.sprintf($i.project_id) ) :>"><: $i.project_name :></a>
+            </span>
+:   }
+
+:   if $i.tag_names  &&  defined $path_format.tag {
             <span class="tags">
 :     for $i.tag_names.split('::') -> $tag_name {
               <span class="tag">
@@ -156,6 +162,15 @@
         <span class="mwday">{$i.option_mwday_name}</span>
 {/if}
 
+: if defined $path_format.project {
+{if $i.project_name != null}
+        <span class="project_name">
+          <a href="<: uri_for( $path_format.project.sprintf('{$tag_name}') ) :>">{$i.project_name}</a>
+        </span>
+{/if}
+: }
+
+: if defined $path_format.tag {
 {if $i.tag_names != ''}
         <span class="tags">
 {  foreach item=tag_name from=$i.tag_names|split}
@@ -165,6 +180,7 @@
 {  /foreach}
         </span>
 {/if}
+: }
 </div>
 
       <div class="content">

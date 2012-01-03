@@ -1,4 +1,6 @@
 (function() {
+  var __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
   window.GTDme = {};
 
@@ -133,6 +135,7 @@
       this.$ = $('#items');
       this.$list = this.$.find('> ul');
       this.items = {};
+      this.project_selector = new GTDme.Selector.Projects;
       this.api_url = {
         update: "" + URL_BASE + "api/item/update",
         update_step: "" + URL_BASE + "api/item/update_step",
@@ -303,8 +306,49 @@
     };
 
     ItemManager.prototype._route_deliver = function(m) {
-      var item_id, method_name, target;
+      var $src, item, item_id, method_name, target, _base, _ref,
+        _this = this;
       target = m[0], item_id = m[1];
+      if (target === 'project') {
+        item = (_ref = (_base = this.items)[item_id]) != null ? _ref : _base[item_id] = new GTDme.Item({
+          id: item_id,
+          manager: this
+        });
+        $src = item.$.find(".menu ul li a[href^=\"#/deliver/project/\"]");
+        this.project_selector.show({
+          item: item,
+          $src: $src,
+          select: function(project) {},
+          create: function(project) {
+            return _this.deliver_simple(item_id, 'project');
+          },
+          assign: function(project) {
+            var ajax_params;
+            ajax_params = {
+              url: _this.api_url.update,
+              type: 'post',
+              dataType: 'json',
+              data: {
+                id: item_id,
+                project_id: project.id,
+                belongs: 'project'
+              },
+              success: function(res, status, xhr) {
+                var $li;
+                $li = _this.get_item({
+                  id: item_id
+                });
+                return $li.addClass("to_project").fadeOut(function() {
+                  return $(this).remove();
+                });
+              },
+              error: function(xhr, status) {}
+            };
+            return $.ajax(ajax_params);
+          }
+        });
+        return false;
+      }
       method_name = "deliver_" + target;
       if (this[method_name] != null) {
         this[method_name](item_id);
@@ -559,6 +603,184 @@
     return Router;
 
   })();
+
+  /*
+   *
+   *  GTDme.Selector -
+   *
+  */
+
+  GTDme.Selector = (function() {
+
+    function Selector(params) {
+      if (params == null) params = {};
+      this.router;
+      this._cache;
+      this._item;
+      this._callback_select;
+      this._callback_create;
+      this._callback_assign;
+      this.$;
+      this.$head;
+      this.$body;
+      this.$foot;
+      this.$loading;
+      this.$list;
+      this.$_src;
+    }
+
+    Selector.prototype.show = function(params) {
+      var self;
+      self = this;
+      this.hide();
+      this._item = params.item;
+      this.$_src = params.$src;
+      this._callback_select = params.select;
+      this._callback_create = params.create;
+      this._callback_assign = params.assign;
+      this.$.show();
+      this.$.css({
+        top: this.$_src.offset().top - 80,
+        left: this.$_src.offset().left - 400
+      });
+      this._item.$.addClass('hover');
+      this.$loading.show();
+      this.$button_cancel.bind('click.cancel', function() {
+        return self.router.match($(this).attr('href')).run(self);
+      });
+      return this.load();
+    };
+
+    Selector.prototype.hide = function() {
+      var _ref, _ref2;
+      this.$.hide();
+      this.$list.empty();
+      this.$button_cancel.unbind('click.cancel');
+      if ((_ref = this._item) != null) {
+        if ((_ref2 = _ref.$) != null) _ref2.removeClass('hover');
+      }
+      delete this._item;
+      return delete this.$_src;
+    };
+
+    Selector.prototype.load = function() {};
+
+    Selector.prototype.update_view = function() {};
+
+    return Selector;
+
+  })();
+
+  /*
+   *
+   *  GTDme.Selector.Projects -
+   *
+  */
+
+  GTDme.Selector.Projects = (function(_super) {
+
+    __extends(Projects, _super);
+
+    function Projects(params) {
+      if (params == null) params = {};
+      Projects.__super__.constructor.call(this, params);
+      this.$ = $('#selector-project');
+      this.$head = this.$.find('> .head');
+      this.$body = this.$.find('> .body');
+      this.$foot = this.$.find('> .foot');
+      this.$loading = this.$body.find('> .loading');
+      this.$list = this.$body.find('> ul');
+      this.$button_cancel = this.$foot.find('a.button-cancel');
+      this.router = new Router({
+        connect: {
+          '/project/create': this._route_create,
+          '/project/assign/([0-9]+)': this._route_assign,
+          '/project/cancel': this._route_cancel
+        }
+      });
+    }
+
+    Projects.prototype.hide = function() {
+      Projects.__super__.hide.call(this);
+      delete this._callback_select;
+      delete this._callback_create;
+      return delete this._callback_assign;
+    };
+
+    Projects.prototype.load = function() {
+      var ajax_params,
+        _this = this;
+      ajax_params = {
+        url: "" + URL_BASE + "api/project/list?t=" + ((new Date()).getTime()),
+        type: 'get',
+        dataType: 'json',
+        data: {},
+        success: function(res, status, xhr) {
+          _this.update_view(res.projects);
+          return _this._cache = res.projects;
+        },
+        error: function(xhr, status) {}
+      };
+      if (this._cache != null) {
+        return this.update_view(this._cache);
+      } else {
+        return $.ajax(ajax_params);
+      }
+    };
+
+    Projects.prototype.update_view = function(projects) {
+      var $jarty_template, html, self;
+      self = this;
+      html = $jarty_template = $('#jarty\\:selector-project-item').jarty({
+        projects: projects
+      });
+      this.$loading.hide();
+      this.$list.html(html);
+      return this.$list.find('> li a').hover(function() {
+        return $(this).bind('click.mouseover', function(ev) {
+          var $a;
+          $a = $(ev.target);
+          return self.router.match($a.attr('href')).run(self);
+        });
+      }, function() {
+        return $(this).unbind('click.mouseover');
+      });
+    };
+
+    Projects.prototype._route_create = function(m) {
+      var o;
+      o = {
+        id: null,
+        type: 'create'
+      };
+      if (typeof this._callback_select === "function") this._callback_select(o);
+      if (typeof this._callback_create === "function") this._callback_create(o);
+      delete this._cache;
+      this.hide();
+      return false;
+    };
+
+    Projects.prototype._route_assign = function(m) {
+      var o, project_id;
+      project_id = m[0];
+      o = {
+        id: project_id,
+        type: 'assign'
+      };
+      if (typeof this._callback_select === "function") this._callback_select(o);
+      if (typeof this._callback_assign === "function") this._callback_assign(o);
+      this.hide();
+      return false;
+    };
+
+    Projects.prototype._route_cancel = function(m) {
+      this.hide();
+      return false;
+    };
+
+    return Projects;
+
+  })(GTDme.Selector);
 
   /*
    *

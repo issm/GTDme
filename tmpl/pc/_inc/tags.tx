@@ -1,0 +1,40 @@
+<style>
+#tags {
+  margin: 8px 0 16px 0;
+}
+
+#tags ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#tags ul li {
+    margin: 0 1px;
+  display: inline;
+}
+#tags ul li a {
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #fff;
+    background: #6a88ff;
+}
+#tags ul li a:hover {
+    background: #6ac8ff;
+    text-decoration: none;
+}
+
+</style>
+
+
+: # <!-- #tags -->
+<div class="span16" id="tags">
+  <ul>
+: while $iterator_tag.next() -> $i {
+    <li id="tags-item:<: $i.tag_id :>" class="">
+      <a href="<: $path_format.tag.sprintf($i.name) :>"><: $i.name :></a>
+    </li>
+: }
+  </ul>
+</div>
+: # <!-- /#tags -->

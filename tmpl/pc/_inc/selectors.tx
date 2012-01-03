@@ -1,0 +1,114 @@
+: # <!-- #selector-project -->
+<style>
+#selector-project {
+    margin: 0;
+    padding: 0;
+    border: 2px solid #666;
+    border-radius: 6px;
+    display: none;
+    position: absolute;
+    z-index: 1200;
+    top: 0;
+    left: 0;
+    width: 400px;
+    max-height: auto;
+    box-shadow: 0px 0px 12px #999;
+    background-color: #f6f6f6;
+    line-height: 100%;
+    font-size: 90%;
+}
+
+#selector-project .head {
+    padding: 8px 12px;
+    border-top-right-radius: 4px;
+    border-top-left-radius: 4px;
+    color: #fff;
+    background-color: #999;
+}
+
+#selector-project .body {
+    margin: 0;
+    padding: 0;
+    max-height: 400px;
+    overflow: auto;
+}
+
+#selector-project .body .loading {
+    padding: 16px;
+    text-align: center;
+}
+
+#selector-project .body ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+#selector-project .body ul li {
+    margin: 0;
+}
+
+#selector-project .body ul li a {
+    margin: 0;
+    padding: 4px 12px;
+    border-top: 1px solid #ddd;
+    display: block;
+    height: 100%;
+    text-decoration: none;
+    /*text-shadow: -1px -1px 1px #ddd;*/
+}
+#selector-project .body ul li a:hover {
+    color: #ff6789;
+    background-color: #ffe6ab;
+}
+
+#selector-project .foot {
+    margin: 0;
+    padding: 0;
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px;
+    background-color: #ddd;
+}
+
+#selector-project .foot .actions {
+    margin: 0;
+    padding: 8px;
+    background: none;
+    text-align: center;
+}
+</style>
+
+<div id="selector-project">
+  <div class="head">
+    Project Selector
+  </div>
+  <div class="body">
+    <div class="loading">
+      Loading...
+    </div>
+    <ul>
+    </ul>
+  </div>
+  <div class="foot">
+    <div class="actions">
+      <a class="btn button-cancel" href="#/project/cancel">Cancel</a>
+    </div>
+  </div>
+</div>
+: # <!-- /#selector-project -->
+
+
+:# <!-- #jarty:selector-project-item -->
+<script id="jarty:selector-project-item" type="text/jarty">
+{* <![CDATA[ *}
+<li>
+  <a href="#/project/create">Create</a>
+</li>
+{foreach item=i from=$projects}
+<li id="selector-project:{$i.project_id}">
+  <a href="#/project/assign/{$i.project_id}">to&nbsp; "{$i.name}"</a>
+</li>
+{/foreach}
+{* ]]> *}
+</script>
+:# <!-- /#jarty:selector-project-item -->

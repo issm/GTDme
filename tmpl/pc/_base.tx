@@ -119,5 +119,7 @@ window.URL_BASE = '<: uri_for('/') :>';
     </div>
 : }
 
+: include _inc::selectors {}
+
 </body>
 </html>

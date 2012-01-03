@@ -53,6 +53,7 @@ table {
     pk 'project_id';
     columns (
         {name => 't_done', type => 4},
+        {name => 'ord', type => 4},
         {name => 't_up', type => 4},
         {name => 'name', type => 12},
         {name => 'description', type => 12},

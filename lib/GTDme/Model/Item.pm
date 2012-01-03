@@ -30,6 +30,7 @@ sub search {
         my $undone        => { isa => 'Int', default => 0 },
 
         my $with_datetime => { isa => 'Int', default => 0 },
+        my $with_project  => { isa => 'Int', default => 0 },
         my $with_tag      => { isa => 'Int', default => 0 },
 
         my $order_by_ord  => { isa => 'Str', optional => 1 },
@@ -79,6 +80,13 @@ sub search {
             [qw/t_add   -i datetime_add/,  sub { "FROM_UNIXTIME($_[1])"}],
             [qw/t_up    -i datetime_up/,   sub { "FROM_UNIXTIME($_[1])"}],
             [qw/t_done  -i datetime_done/, sub { "FROM_UNIXTIME($_[1])"}],
+        );
+    }
+    if ( $with_project ) {
+        push @select, (
+            [qw/name        -pr project_name/],
+            [qw/code        -pr project_code/],
+            [qw/description -pr project_description/]
         );
     }
     if ( $with_tag ) {
@@ -681,6 +689,54 @@ sub _update_content_options {
     }
 
     return $row_item_options;
+}
+
+
+
+sub to_project {
+    args (
+        my $self,
+        my $id      => { isa => 'Int' },
+        my $user_id => { isa => 'Int' },
+    );
+    my $ret;
+    my $db = $self->c->db;
+    my $time = time;
+
+    my $row_item = $db->single(
+        $db->table('item'),
+        { item_id => $id, user_id => $user_id },
+    );
+    unless ( defined $row_item ) {
+        die;
+    }
+
+    my $txn = $db->txn_scope;
+
+    my $row_project = $db->insert(
+        $db->table('project'),
+        {
+            user_id     => $row_item->user_id,
+            name        => $row_item->content,
+            # code        => '',
+            # description => '',
+            ord         => 0,
+            t_add       => $row_item->t_add,
+            t_up        => $row_item->t_up,
+        },
+    );
+
+    $row_item->update({
+        belongs    => 'project',
+        project_id => $row_project->project_id,
+    });
+
+    # タグ情報とかどうする？
+
+    $txn->commit;
+
+    $ret = Data::Recursive::Encode->decode_utf8( $row_item->get_columns );
+    return $ret;
 }
 
 

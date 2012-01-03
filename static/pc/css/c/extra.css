@@ -23,13 +23,15 @@
     background-color: #f8f8f8;
 }
 
-#items > ul > li:hover {
+#items > ul > li:hover,
+#items > ul > li.hover {
     margin: -1px -1px 7px -1px;
     border-width: 2px;
     border-color: #ababab;
     background-color: #eaffb0;
 }
-#items > ul > li:last-child:hover {
+#items > ul > li:last-child:hover,
+#items > ul > li:last-child.hover {
     margin: -1px -1px -1px -1px;
 }
 
@@ -66,6 +68,21 @@
 #items ul li .main .options .mwday {
     margin-right: 1em;
 }
+
+#items ul li .main .options .project_name {
+    margin: 0 1px;
+}
+#items ul li .main .options .project_name a {
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #fff;
+    background-color: #ff8036;
+}
+#items ul li .main .options .project_name a:hover {
+    background-color: #ffb866;
+    text-decoration: none;
+}
+
 
 #items ul li .main .options .tags {
 }
@@ -158,7 +175,8 @@
     top: -24px;
     right: 16px;
 }
-#items ul li:hover .menu {
+#items ul li:hover .menu,
+#items ul li.hover .menu {
     display: block;
 }
 
@@ -207,7 +225,8 @@
     height: 24px;
     background: #c8c8c8;
 }
-#items ul li:hover .sort {
+#items ul li:hover .sort,
+#items ul li.hover .sort {
     display: block;
 }
 #items ul li .sort a {

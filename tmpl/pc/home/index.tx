@@ -11,17 +11,34 @@
 
 : around content -> {
 <h1>
-  Home
-: if defined $tag {
+: if defined $project {
+  <a href="<: uri_for('/home/') :>">Home</a>
+  / <: $project.name :>
+: }
+: elsif defined $tag {
+  <a href="<: uri_for('/home/') :>">Home</a>
   / <: $tag :>
+: }
+: else {
+  Home
 : }
 </h1>
 
 
-: include _inc::items {
-:   disable_menu    => { action => 1 },
-:   enable_sortable => 1,
+: include _inc::projects {
+:   path_format     => { project => '/home/p/%d' },
+: }
+
+
+: include _inc::tags {
 :   path_format     => { tag => '/home/t/%s' },
+: }
+
+
+: include _inc::items {
+:   disable_menu    => { action => 1, calendar => 1, material => 1, background => 1, someday => 1, project => 1, trash => 1 },
+:   enable_sortable => 1,
+:   path_format     => { project => '/home/p/%s', tag => '/home/t/%s' },
 : }
 
 

@@ -15,6 +15,10 @@ my $router = router {
     connect '/item/update_step'  => { controller => 'Root', action => 'item_update_step'  }, { method => 'POST' };
     connect '/item/update_order' => { controller => 'Root', action => 'item_update_order' }, { method => 'POST' };
     connect '/item/mark_done'    => { controller => 'Root', action => 'item_mark_done'    }, { method => 'POST' };
+
+    connect '/project/list'         => { controller => 'Root', action => 'project_list'         }, { method => 'GET' };
+    connect '/project/update'       => { controller => 'Root', action => 'project_update'       }, { method => 'POST' };
+    connect '/project/update_order' => { controller => 'Root', action => 'project_update_order' }, { method => 'POST' };
 };
 
 my @controllers = Module::Pluggable::Object->new(

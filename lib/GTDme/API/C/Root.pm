@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use utf8;
 use Encode;
+use Data::Recursive::Encode;
 use Try::Tiny;
 use Log::Minimal;
 
@@ -36,24 +37,36 @@ sub item_update {
     my ($data, $status) = ({}, 200);
     try {
         my $m_item = $c->model('item');
-        my $up = $m_item->update(%params_up);
-        my $item = $m_item->search(
-            id            => $up->{item_id},
-            user_id       => $my->{id},
-            with_datetime => 1,
-            with_tag      => 1,
-        )->{list}[0];
-
-        ##
-        #$item->{tag_names} = [ split '::', $item->{tag_names}
-        ##
-        $item->{option_wday_name} = $c->config->{wday_name}{$item->{option_wday}} || '';
-        ##
-        if ( $item->{option_mwday} ) {
-            use GTDme::Xslate::Bridge::Functions;
-            $item->{option_mwday_name}
-                = GTDme::Xslate::Bridge::Functions::parse_mwday($item->{option_mwday});
-        };
+        my ($up, $item);
+        if ( defined $belongs  &&  $belongs eq 'project'  &&  ! defined $project_id ) {
+            ### port item to  project
+            #$up = $m_item->update(%params_up);
+            $up = $m_item->to_project(
+                id      => $params_up{id},
+                user_id => $params_up{user_id},
+            );
+        }
+        else {
+            ### assign item to  project
+            $up = $m_item->update(%params_up);
+            $item = $m_item->search(
+                id            => $up->{item_id},
+                user_id       => $my->{id},
+                with_datetime => 1,
+                with_project  => 1,
+                with_tag      => 1,
+            )->{list}[0];
+            ##
+            #$item->{tag_names} = [ split '::', $item->{tag_names}
+            ##
+            $item->{option_wday_name} = $c->config->{wday_name}{$item->{option_wday}} || '';
+            ##
+            if ( $item->{option_mwday} ) {
+                use GTDme::Xslate::Bridge::Functions;
+                $item->{option_mwday_name}
+                    = GTDme::Xslate::Bridge::Functions::parse_mwday($item->{option_mwday});
+            };
+        }
 
         $data = {
             item => $item,
@@ -95,6 +108,7 @@ sub item_update_step {
             id            => $item_id,
             user_id       => $my->{id},
             with_datetime => 1,
+            with_project  => 1,
             with_tag      => 1,
         )->{list}[0];
 
@@ -199,6 +213,153 @@ sub item_mark_done {
     return $res;
 }
 
+
+
+### project
+
+sub project_list {
+    my ($class, $c) = @_;
+    my $req = $c->req;
+    my $my = $c->stash->{my};
+
+    my ($data, $status) = ({}, 200);
+    try {
+        my $m_pr = $c->model('project');
+        my $projects = Data::Recursive::Encode->decode_utf8(
+            $m_pr->search(
+                user_id      => $my->{id},
+                order_by_ord => 'asc',
+            )->{list} || []
+        );
+
+        $data = {
+            status   => $status,
+            projects => $projects,
+        };
+    } catch {
+        my $msg = shift;
+        warnf $msg;
+        $data = {
+            status        => ($status = 500),
+            error_message => $msg,
+        };
+    };
+
+    my $res = $c->render_json($data);
+    $res->status($status || 200);
+    return $res;
+}
+
+
+sub project_update {
+    my ($class, $c) = @_;
+    my $req = $c->req;
+    my $my = $c->stash->{my};
+
+    my $project_id  = $req->param('id');
+    my $name        = $req->param('name');
+    my $code        = $req->param('code');
+    my $description = $req->param('description') || '';
+
+    my %params_up = (
+        user_id => $my->{id},
+    );
+    $params_up{id}          = $project_id   if defined $project_id;
+    $params_up{name}        = $name         if defined $name;
+    $params_up{code}        = $code         if defined $code;
+    $params_up{description} = $description  if defined $description;
+
+    my ($data, $status) = ({}, 200);
+    try {
+        my $m_pr = $c->model('project');
+        my $up = $m_pr->update(%params_up);
+
+        $data = {
+            status  => 200,
+            project => $up,
+        };
+    } catch {
+        my $msg = shift;
+        warnf $msg;
+        $data = {
+            status        => 500,
+            error_message => $msg,
+        };
+    };
+
+    my $res = $c->render_json($data);
+    $res->status($status || 200);
+    return $res;
+}
+
+
+sub project_assign_item {
+    my ($class, $c) = @_;
+    my $req = $c->req;
+    my $my = $c->stash->{my};
+
+    my $project_id  = $req->param('id');
+    my $item_id     = $req->param('item_id');
+
+    my ($data, $status) = ({}, 200);
+    try {
+        my $m_item = $c->model('item');
+
+        $data = {
+            status => ($status = 200),
+        };
+    } catch {
+        my $msg = shift;
+        warnf $msg;
+        $data = {
+            status        => ($status = 500),
+            error_message => $msg,
+        };
+    };
+
+    my $res = $c->render_json($data);
+    $res->status($status || 200);
+    return $res;
+}
+
+
+sub project_update_order {
+    my ($class, $c) = @_;
+    my $req = $c->req;
+    my $my = $c->stash->{my};
+
+    my $project_id      = $req->param('id');
+    my $project_id_prev = $req->param('id_prev');
+    my $project_id_next = $req->param('id_next');
+
+    my ($data, $status) = ({}, 200);
+    try {
+        my $m_pr = $c->model('project');
+        $m_pr->update_order(
+            id      => $project_id,
+            id_prev => $project_id_prev,
+            id_next => $project_id_next,
+            user_id     => $my->{id},
+        );
+    } catch {
+        my $msg = shift;
+        warnf $msg;
+        $data = {
+            status        => 500,
+            error_message => $msg,
+        };
+        $status = 500;
+    };
+
+    my $res = $c->render_json($data);
+    $res->status($status || 200);
+    return $res;
+}
+
+
+
+sub project_mark_done {
+}
 
 
 1;

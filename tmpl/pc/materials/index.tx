@@ -10,6 +10,12 @@
 </h1>
 
 
+: include _inc::tags {
+:   path_format     => { tag => '/materials/t/%s' },
+: }
+
+
+
 : include _inc::items {
 :   disable_menu    => { material => 1 },
 :   enable_sortable => 1,

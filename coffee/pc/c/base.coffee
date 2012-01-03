@@ -110,6 +110,7 @@ class GTDme.ItemManager
         @$list = @$.find('> ul')
 
         @items = {}  # key: item_id
+        @project_selector = new GTDme.Selector.Projects
 
         @api_url =
             update:       "#{URL_BASE}api/item/update"
@@ -242,6 +243,36 @@ class GTDme.ItemManager
 
     _route_deliver: (m) ->
         [ target, item_id ] = m
+
+        if target is 'project'
+            item = @items[item_id] ?= new GTDme.Item({ id: item_id, manager: @ })
+            $src =  item.$.find(".menu ul li a[href^=\"#/deliver/project/\"]")
+
+            @project_selector.show
+                item: item
+                $src: $src
+                select: (project) =>
+                create: (project) =>
+                    @deliver_simple(item_id, 'project')
+                assign: (project) =>
+                    ajax_params =
+                        url:      @api_url.update
+                        type:     'post'
+                        dataType: 'json'
+                        data:
+                            id:         item_id
+                            project_id: project.id
+                            belongs:    'project'
+                        success: (res, status, xhr) =>
+                            $li = @get_item({id: item_id})
+                            $li.addClass("to_project").fadeOut ->
+                                $(@).remove()
+                        error: (xhr, status) =>
+
+                    $.ajax(ajax_params)
+
+            return false
+
         method_name = "deliver_#{target}"
         if @[method_name]?
             @[method_name](item_id)
@@ -449,6 +480,157 @@ class @Router
     _cannot_route: (h) ->
         throw new Error('cannot route: ' + h)
 
+###
+ *
+ *  GTDme.Selector -
+ *
+###
+class GTDme.Selector
+    constructor: (params = {}) ->
+        @router
+        @_cache
+        @_item
+        @_callback_select
+        @_callback_create
+        @_callback_assign
+
+        @$
+        @$head
+        @$body
+        @$foot
+        @$loading
+        @$list
+        @$_src
+
+
+    show: (params) ->
+        self = @
+
+        @hide()
+
+        @_item = params.item
+        @$_src = params.$src
+
+        @_callback_select = params.select
+        @_callback_create = params.create
+        @_callback_assign = params.assign
+
+        @$.show()
+        @$.css
+            top:  @$_src.offset().top  - 80
+            left: @$_src.offset().left - 400
+        @_item.$.addClass('hover')
+        @$loading.show()
+
+        @$button_cancel.bind 'click.cancel', ->
+            return self.router.match( $(@).attr('href') ).run(self)
+
+        @load()
+
+    hide: ->
+        @$.hide()
+        @$list.empty()
+
+        @$button_cancel.unbind 'click.cancel'
+
+        @_item?.$?.removeClass('hover')
+        delete @_item
+        delete @$_src
+
+    load: ->
+    update_view: ->
+
+###
+ *
+ *  GTDme.Selector.Projects -
+ *
+###
+class GTDme.Selector.Projects extends GTDme.Selector
+    constructor: (params = {}) ->
+        super(params)
+        @$ = $('#selector-project')
+        @$head = @$.find('> .head')
+        @$body = @$.find('> .body')
+        @$foot = @$.find('> .foot')
+        @$loading       = @$body.find('> .loading')
+        @$list          = @$body.find('> ul')
+        @$button_cancel = @$foot.find('a.button-cancel')
+
+        @router = new Router
+            connect:
+                '/project/create':          @_route_create
+                '/project/assign/([0-9]+)': @_route_assign
+                '/project/cancel':          @_route_cancel
+
+    # show: (params) ->
+    #     super(params)
+
+    hide: ->
+        super()
+        delete @_callback_select
+        delete @_callback_create
+        delete @_callback_assign
+
+    load: ->
+        ajax_params =
+            url:      "#{URL_BASE}api/project/list?t=#{(new Date()).getTime()}"
+            type:     'get'
+            dataType: 'json'
+            data: {
+            }
+            success: (res, status, xhr) =>
+                @update_view(res.projects)
+                @_cache = res.projects
+            error: (xhr, status) =>
+
+        if @_cache?
+            @update_view(@_cache)
+        else
+            $.ajax(ajax_params)
+
+    update_view: (projects) ->
+        self = @
+        html = $jarty_template = $('#jarty\\:selector-project-item').jarty
+            projects: projects
+
+        @$loading.hide()
+        @$list.html(html)
+        @$list.find('> li a').hover(
+            ->
+                $(@).bind 'click.mouseover', (ev) ->
+                    $a = $( ev.target )
+                    return self.router.match( $a.attr('href') ).run( self )
+            ->
+                $(@).unbind 'click.mouseover'
+        )
+
+    _route_create: (m) ->
+        o =
+            id:   null
+            type: 'create'
+
+        @_callback_select?(o)
+        @_callback_create?(o)
+
+        delete @_cache
+        @hide()
+        return false
+
+    _route_assign: (m) ->
+        [ project_id ] = m
+        o =
+            id:   project_id
+            type: 'assign'
+
+        @_callback_select?(o)
+        @_callback_assign?(o)
+
+        @hide()
+        return false
+
+    _route_cancel: (m) ->
+        @hide()
+        return false
 
 ###
  *
@@ -492,6 +674,7 @@ class GTDme.Screen
 
     hide: ->
         @$.hide()
+
 
 
 window.add_jarty_filter = (name, func) ->

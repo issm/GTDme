@@ -21,8 +21,9 @@ my $router = router {
     connect '/my/trigger_list' => { controller => 'Root', action => 'my_trigger_list' };
 
 
-    connect '/home/'              => { controller => 'Root', action => 'home_index' };
-    connect '/home/t/{tag:[^/]+}' => { controller => 'Root', action => 'home_index' };
+    connect '/home/'                   => { controller => 'Root', action => 'home_index' };
+    connect '/home/t/{tag:[^/]+}'      => { controller => 'Root', action => 'home_index' };
+    connect '/home/p/{project_id:\d+}' => { controller => 'Root', action => 'home_index_in_project' };
 
 
     connect '/inbox/'              => { controller => 'Root', action => 'inbox_index' };
@@ -46,7 +47,9 @@ my $router = router {
     connect '/someday/t/{tag:[^/]+}' => { controller => 'Root', action => 'someday_index' };
 
 
-    connect '/projects/' => { controller => 'Root', action => 'projects_index' };
+    connect '/projects/'                               => { controller => 'Root', action => 'projects_index'  };
+    connect '/projects/{project_id:\d+}'               => { controller => 'Root', action => 'projects_detail' };
+    connect '/projects/{project_id:\d+}/t/{tag:[^/]+}' => { controller => 'Root', action => 'projects_detail' };
 };
 
 my @controllers = Module::Pluggable::Object->new(

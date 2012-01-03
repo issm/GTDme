@@ -1,0 +1,40 @@
+<style>
+#projects {
+  margin: 8px 0 16px 0;
+}
+
+#projects ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+#projects ul li {
+    margin: 0 1px;
+  display: inline;
+}
+#projects ul li a {
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #fff;
+    background-color: #ff8036;
+}
+#projects ul li a:hover {
+    background-color: #ffb866;
+    text-decoration: none;
+}
+
+</style>
+
+
+: # <!-- #projects -->
+<div class="span16" id="projects">
+  <ul>
+: while $iterator_project.next() -> $i {
+    <li id="projectss-item:<: $i.project_id :>" class="">
+      <a href="<: $path_format.project.sprintf($i.project_id) :>"><: $i.name :></a>
+    </li>
+: }
+  </ul>
+</div>
+: # <!-- /#projects -->

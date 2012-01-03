@@ -1,0 +1,40 @@
+: cascade _base
+
+
+: around css_additional -> {
+<link href="<: static_file('/static/css/p/projects/index.css') :>" rel="stylesheet" type="text/css" media="screen" />
+: }
+
+
+: around js_additional -> {
+<script type="text/javascript" src="<: uri_for('/static/js/lib/jarty.js') :>"></script>
+<script type="text/javascript" src="<: uri_for('/static/js/p/projects/index.js') :>"></script>
+: }
+
+
+: around content -> {
+<h1>
+  <a href="<: uri_for('/projects/') :>">Projects</a>
+:   if defined $tag {
+  / <a href="<: uri_for( '/projects/%d'.sprintf($project.project_id) ) :>"><: $project.name :></a>
+  / <: $tag :>
+:   } else {
+  / <: $project.name :>
+:   }
+</h1>
+
+
+: include _inc::tags {
+:   path_format     => { tag => '/projects/%d/t/%%s'.sprintf($project.project_id) },
+: }
+
+
+: include _inc::items {
+:   disable_menu    => { done => 1 },
+:   enable_sortable => 1,
+:   path_format     => { tag => '/projects/%d/t/%%s'.sprintf($project.project_id) },
+: }
+
+
+
+: }
