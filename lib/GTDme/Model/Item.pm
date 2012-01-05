@@ -405,8 +405,6 @@ sub update_order {
     my ($is_up, $is_down);
     $is_up   = 1  if defined $row_prev  &&  $ord < $ord_prev;
     $is_down = 1  if defined $row_next  &&  $ord > $ord_next;
-    # warn Dumper [$ord_prev, $ord, $ord_next];
-    # warn Dumper [$is_up, $is_down];
 
     my $txn = $db->txn_scope;
 
