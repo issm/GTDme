@@ -254,7 +254,7 @@ sub _ids_in_tag {
     );
     my @ret;
     my $db = $self->c->db;
-    my ($rs, $itr, @where);
+    my ($rs, $itr, @where, @join);
 
     ### where
     @where = (
@@ -262,29 +262,83 @@ sub _ids_in_tag {
         [qw/name    -t/] => $tag,
     );
     push @where, [qw/project_id -i/] => $project_id  if defined $project_id;
-    push @where, [qw/belongs    -i/] => $belongs     if defined $belongs;
+    # same as in ->search
+    if ( defined $belongs ) {
+        # calendar_unclassified, calendar_theday, calendar_weekly, calendar_monthly
+        if ( my ($calendar_class) = $belongs =~ /calendar_(unclassified|theday|weekly|monthly)/ ) {
+            push @where, [qw/belongs -i/] => 'calendar';
+            if ( $calendar_class eq 'theday' ) {
+                push @where, (
+                    [qw/t_start -i_opt/] => { '>' => 0 },
+                );
+            }
+            elsif ( $calendar_class eq 'weekly' ) {
+                push @where, (
+                    [qw/wday -i_opt/] => { '>' => 0 },
+                );
+            }
+            elsif ( $calendar_class eq 'monthly' ) {
+                push @where, (
+                    # i_opt.mday > 0 OR i_opt.mwday > 0
+                    [qw/mday -i_opt -/, sub {
+                         my $c0 = $_[1];
+                         my $c1 = $db->column(qw/mwday -i_opt/);
+                         "$c0 + $c1";
+                     }] => { '>' => 0 },
+                );
+            }
+            else {  # unclassified
+                push @where, (
+                    [qw/t_start -i_opt/] => 0,
+                    [qw/t_end   -i_opt/] => 0,
+                    [qw/wday    -i_opt/] => 0,
+                    [qw/mday    -i_opt/] => 0,
+                    [qw/mwday   -i_opt/] => 0,
+                );
+            }
+        }
+        else {
+            push @where, [qw/belongs -i/] => $belongs;
+        }
+    }
+
+
+    @join = (
+        [qw/tag t/] => [
+            {
+                table     => [qw/item_2_tag i2t/],
+                type      => 'inner',
+                condition => 'i2t.tag_id = t.tag_id',
+            },
+        ],
+        [qw/item_2_tag i2t/] => [
+            {
+                table     => [qw/item i/],
+                type      => 'inner',
+                condition => 'i.item_id = i2t.item_id',
+            },
+        ],
+    );
+    if ( defined $belongs ) {
+        push @join, (
+            [qw/item i/] => [
+                {
+                    table     => [qw/item_options i_opt/],
+                    type      => 'left',
+                    condition => 'i_opt.item_id = i.item_id',
+                },
+            ],
+        );
+    }
+
+
 
     $rs = $db->resultset(
         select => [
             [qw/item_id -i2t/],
         ],
         where => \@where,
-        join => [
-            [qw/tag t/] => [
-                {
-                    table     => [qw/item_2_tag i2t/],
-                    type      => 'inner',
-                    condition => 'i2t.tag_id = t.tag_id',
-                },
-            ],
-            [qw/item_2_tag i2t/] => [
-                {
-                    table     => [qw/item i/],
-                    type      => 'inner',
-                    condition => 'i.item_id = i2t.item_id',
-                },
-            ],
-        ],
+        join  => \@join,
     );
 
     $itr = $db->search_from_resultset($rs);
