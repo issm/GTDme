@@ -373,22 +373,27 @@ sub update {
 sub update_order {
     args (
         my $self,
-        my $id      => { isa => 'Int' },
-        my $id_prev => { isa => 'Int|Undef' },
-        my $id_next => { isa => 'Int|Undef' },
-        my $user_id => { isa => 'Int' },
+        my $id         => { isa => 'Int' },
+        my $id_prev    => { isa => 'Int|Undef' },
+        my $id_next    => { isa => 'Int|Undef' },
+        my $user_id    => { isa => 'Int' },
+        my $belongs    => { isa => 'Str|Undef', optional => 1 },
+        my $project_id => { isa => 'Int|Undef', optional => 1 },
+        my $tag        => { isa => 'Str|Undef', optional => 1 },
     );
     my $ret;
 
     my $db = $self->c->db;
     my $table = $db->table('item');
 
+    $self->_uniquifiy_order( user_id => $user_id );
+
     $db->suppress_row_objects(1);
 
     my ($row, $row_prev, $row_next);
-    $row      = $db->single($table, { item_id => $id, user_id => $user_id });
-    $row_prev = $db->single($table, { item_id => $id_prev, user_id => $user_id })  if defined $id_prev;
-    $row_next = $db->single($table, { item_id => $id_next, user_id => $user_id })  if defined $id_next;
+    $row      = $db->single($table, { user_id => $user_id, item_id => $id });
+    $row_prev = $db->single($table, { user_id => $user_id, item_id => $id_prev })  if defined $id_prev;
+    $row_next = $db->single($table, { user_id => $user_id, item_id => $id_next })  if defined $id_next;
     ## die  if not exists
 
     my ($ord, $ord_prev, $ord_next) = (
@@ -400,51 +405,138 @@ sub update_order {
     my ($is_up, $is_down);
     $is_up   = 1  if defined $row_prev  &&  $ord < $ord_prev;
     $is_down = 1  if defined $row_next  &&  $ord > $ord_next;
+    # warn Dumper [$ord_prev, $ord, $ord_next];
+    # warn Dumper [$is_up, $is_down];
 
     my $txn = $db->txn_scope;
 
-    if ( $is_up ) {
-        my $itr = $db->search_by_sql( << "        ...", [ $row->{belongs}, $ord + 1, $ord_prev ] );
-SELECT item_id, ord
-  FROM $table
-  WHERE belongs = ?
-    AND ord BETWEEN ? AND ?
-    ORDER BY ord ASC
-        ...
-        $itr->suppress_object_creation(0);
-        while ( my $_row = $itr->next ) {
-            $_row->update({ ord => $_row->ord - 1 });
-        }
-
-        $db->update(
-            $table,
-            { ord => $ord_prev },
-            { item_id => $id },
+    my ($rs, $itr, @select, @where);
+    @select = (
+        [qw/item_id/],
+        [qw/ord/],
+    );
+    @where = (
+        [qw/user_id/] => $user_id,
+    );
+    push @where, [qw/belongs/]    => $belongs     if defined $belongs;
+    push @where, [qw/project_id/] => $project_id  if defined $project_id;
+    if ( defined $tag ) {
+        my @_ids = $self->_ids_in_tag(
+            user_id    => $user_id,
+            tag        => $tag,
+            project_id => $project_id,
+            belongs    => $belongs,
         );
+        push @where, [qw/item_id/] => \@_ids;
+    }
+
+    if ( $is_up ) {
+        push @where, [qw/ord/] => { between => [ $ord, $ord_prev ] };
+
+        $rs = $db->resultset(
+            select => \@select,
+            from   => [ [qw/item/] ],
+            where  => \@where,
+        );
+        $rs->add_order_by( $db->column(qw/ord/) => 'asc' );
+
+        $itr = $db->search_from_resultset($rs);
+        $itr->suppress_object_creation(1);
+
+        my (@_id, @_ord);
+        while ( my $_row = $itr->next ) {
+            push @_id,  $_row->{item_id};
+            push @_ord, $_row->{ord};
+        }
+        unshift @_ord, pop @_ord;  # 1,2,3,4,5 -> 5,1,2,3,4
+
+        while ( @_id ) {
+            my ($_id, $_ord) = ( shift(@_id), shift(@_ord) );
+            $db->update(
+                $table,
+                { ord => $_ord },
+                { item_id => $_id },
+            );
+        }
     }
     elsif ( $is_down ) {
-        my $itr = $db->search_by_sql( << "        ...", [ $row->{belongs}, $ord_next, $ord - 1 ] );
-SELECT item_id, ord
-  FROM $table
-  WHERE belongs = ?
-    AND ord BETWEEN ? AND ?
-    ORDER BY ord ASC
-        ...
-        $itr->suppress_object_creation(0);
-        while ( my $_row = $itr->next ) {
-            $_row->update({ ord => $_row->ord + 1 });
-        }
+        push @where, [qw/ord/] => { between => [ $ord_next, $ord ] };
 
-        $db->update(
-            $table,
-            { ord => $ord_next },
-            { item_id => $id },
+        $rs = $db->resultset(
+            select => \@select,
+            from   => [ [qw/item/] ],
+            where  => \@where,
         );
+        $rs->add_order_by( $db->column(qw/ord/) => 'asc' );
+
+        $itr = $db->search_from_resultset($rs);
+        $itr->suppress_object_creation(1);
+
+        my (@_id, @_ord);
+        while ( my $_row = $itr->next ) {
+            push @_id,  $_row->{item_id};
+            push @_ord, $_row->{ord};
+        }
+        push @_ord, shift @_ord;  # 1,2,3,4,5 -> 2,3,4,5,1
+
+        while ( @_id ) {
+            my ($_id, $_ord) = ( shift(@_id), shift(@_ord) );
+            $db->update(
+                $table,
+                { ord => $_ord },
+                { item_id => $_id },
+            );
+        }
     }
 
     $txn->commit;
 
     return $ret;
+}
+
+sub _uniquifiy_order {
+    args (
+        my $self,
+        my $user_id => { isa => 'Int' },
+    );
+    my $db = $self->c->db;
+    my $table = $db->table('item');
+
+    my $is_unique;
+    my $itr_is_unique = $db->search_by_sql(
+        << "        ...",
+SELECT IF(
+  ( SELECT COUNT(ord)          FROM $table WHERE flg_del = 0 AND user_id = ? ) =
+  ( SELECT COUNT(DISTINCT ord) FROM $table WHERE flg_del = 0 AND user_id = ? ),
+  1, 0
+) is_unique
+        ...
+        [ $user_id, $user_id ],
+    );
+    $itr_is_unique->suppress_object_creation(1);
+    $is_unique = $itr_is_unique->next->{is_unique};
+    return 0  if $is_unique;
+
+    my $itr = $db->search_by_sql(
+        << "        ...",
+SELECT item_id, ord
+  FROM $table
+  WHERE flg_del = 0
+    AND user_id = ?
+  ORDER BY ord ASC, item_id ASC
+        ...
+        [ $user_id ],
+    );
+
+    my $txn = $db->txn_scope;
+
+    my $order = 0;
+    while ( my $row = $itr->next ) {
+        $row->update({ ord => ++$order });
+    }
+
+    $txn->commit;
+    return 1;
 }
 
 
