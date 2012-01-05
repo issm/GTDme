@@ -149,15 +149,21 @@ sub item_update_order {
     my $item_id      = $req->param('id');
     my $item_id_prev = $req->param('id_prev');
     my $item_id_next = $req->param('id_next');
+    my $belongs      = $req->param('belongs');
+    my $project_id   = $req->param('project_id');
+    my $tag          = $req->param('tag');
 
     my ($data, $status) = ({}, 200);
     try {
         my $m_item = $c->model('item');
         $m_item->update_order(
-            id      => $item_id,
-            id_prev => $item_id_prev,
-            id_next => $item_id_next,
-            user_id     => $my->{id},
+            user_id    => $my->{id},
+            id         => $item_id,
+            id_prev    => $item_id_prev,
+            id_next    => $item_id_next,
+            belongs    => $belongs,
+            project_id => $project_id,
+            tag        => $tag,
         );
     } catch {
         my $msg = shift;

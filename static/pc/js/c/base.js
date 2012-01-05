@@ -6,6 +6,18 @@
 
   /*
    *
+   *  GTDme.ItemsFilteredBy
+   *
+  */
+
+  GTDme.ItemsFilteredBy = {
+    belongs: null,
+    project_id: null,
+    tag: null
+  };
+
+  /*
+   *
    *  GTDme.InboxAlways - Inbox anywhere
    *
   */
@@ -215,19 +227,29 @@
     };
 
     ItemManager.prototype._update_item_order = function($item) {
-      var ajax_params, item_id, item_id_next, item_id_prev, _ref, _ref2, _ref3, _ref4, _ref5;
+      var ajax_data, ajax_params, item_id, item_id_next, item_id_prev, _ref, _ref2, _ref3, _ref4, _ref5;
       item_id = (_ref = $item.attr('id')) != null ? _ref.split(':')[1] : void 0;
       item_id_prev = (_ref2 = $item.prev()) != null ? (_ref3 = _ref2.attr('id')) != null ? _ref3.split(':')[1] : void 0 : void 0;
       item_id_next = (_ref4 = $item.next()) != null ? (_ref5 = _ref4.attr('id')) != null ? _ref5.split(':')[1] : void 0 : void 0;
+      ajax_data = {
+        id: item_id,
+        id_prev: item_id_prev,
+        id_next: item_id_next
+      };
+      if (GTDme.ItemsFilteredBy.belongs != null) {
+        ajax_data.belongs = GTDme.ItemsFilteredBy.belongs;
+      }
+      if (GTDme.ItemsFilteredBy.project_id != null) {
+        ajax_data.project_id = GTDme.ItemsFilteredBy.project_id;
+      }
+      if (GTDme.ItemsFilteredBy.tag != null) {
+        ajax_data.tag = GTDme.ItemsFilteredBy.tag;
+      }
       ajax_params = {
         url: this.api_url.update_order,
         type: 'post',
         dataType: 'json',
-        data: {
-          id: item_id,
-          id_prev: item_id_prev,
-          id_next: item_id_next
-        },
+        data: ajax_data,
         success: function(res, status, xhr) {},
         error: function(xhr, status) {}
       };

@@ -1,11 +1,27 @@
 : cascade _base
 
 
+: around css_additional -> {}
+
+
+: around js_additional -> {
+<script type="text/javascript">
+GTDme.ItemsFilteredBy.belongs = 'material';
+: if defined $tag {
+GTDme.ItemsFilteredBy.tag = '<: $tag :>';
+: }
+</script>
+: }
+
+
 : around content -> {
 <h1>
-  Materials
 : if defined $tag {
+  <a href="<: uri_for('/materials/') :>">Materials</a>
   / <: $tag :>
+: }
+: else {
+  Materials
 : }
 </h1>
 

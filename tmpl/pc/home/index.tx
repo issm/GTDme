@@ -4,8 +4,17 @@
 : around css_additional -> {}
 
 
-: around css_additional -> {
+: around js_additional -> {
 <script type="text/javascript" src="<: uri_for('/static/js/p/top/index.js') :>"></script>
+<script type="text/javascript">
+GTDme.ItemsFilteredBy.belongs = 'action';
+: if defined $project {
+GTDme.ItemsFilteredBy.project_id = <: $project.project_id :>;
+: }
+: elsif defined $tag {
+GTDme.ItemsFilteredBy.tag = '<: $tag :>';
+: }
+</script>
 : }
 
 

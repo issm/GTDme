@@ -3,6 +3,17 @@ window.GTDme = {}
 
 ###
  *
+ *  GTDme.ItemsFilteredBy
+ *
+###
+GTDme.ItemsFilteredBy =
+    belongs:    null
+    project_id: null
+    tag:        null
+
+
+###
+ *
  *  GTDme.InboxAlways - Inbox anywhere
  *
 ###
@@ -172,16 +183,20 @@ class GTDme.ItemManager
         item_id_prev = $item.prev()?.attr('id')?.split(':')[1]
         item_id_next = $item.next()?.attr('id')?.split(':')[1]
 
+        ajax_data =
+            id:      item_id
+            id_prev: item_id_prev
+            id_next: item_id_next
+        ajax_data.belongs    = GTDme.ItemsFilteredBy.belongs     if GTDme.ItemsFilteredBy.belongs?
+        ajax_data.project_id = GTDme.ItemsFilteredBy.project_id  if GTDme.ItemsFilteredBy.project_id?
+        ajax_data.tag        = GTDme.ItemsFilteredBy.tag         if GTDme.ItemsFilteredBy.tag?
+
         ajax_params =
             url:      @api_url.update_order
             type:     'post'
             dataType: 'json'
-            data:
-                id:      item_id
-                id_prev: item_id_prev
-                id_next: item_id_next
+            data:     ajax_data
             success: (res, status, xhr) ->
-
             error: (xhr, status) ->
 
         $.ajax(ajax_params)

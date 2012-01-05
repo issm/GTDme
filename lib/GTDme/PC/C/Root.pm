@@ -360,8 +360,10 @@ sub projects_detail {
         user_id       => $my->{id},
         project_id    => $project_id,
         belongs       => 'project',
-        with_iterator => 1,
+        order_by_ord  => 'asc',
+        order_by_add  => 'asc',
         with_tag      => 1,
+        with_iterator => 1,
     );
     $params_search_item{tag} = $tag  if defined $tag;
 
