@@ -3,9 +3,14 @@
 
 : around content -> {
 <h1>
-  Calendar / The day
+  Calendar
+
 : if defined $tag {
+  / <a href="<: uri_for('/calendar/theday') :>">The day</a>
   / <: $tag :>
+: }
+: else {
+  / The day
 : }
 </h1>
 
