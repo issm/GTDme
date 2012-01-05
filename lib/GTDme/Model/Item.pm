@@ -774,7 +774,7 @@ sub to_project {
             name        => $row_item->content,
             # code        => '',
             # description => '',
-            ord         => 0,
+            ord         => 0,  # make "new project" be first in list
             t_add       => $row_item->t_add,
             t_up        => $row_item->t_up,
         },
@@ -783,6 +783,7 @@ sub to_project {
     $row_item->update({
         belongs    => 'project',
         project_id => $row_project->project_id,
+        flg_del    => 1,
     });
 
     # タグ情報とかどうする？
