@@ -205,41 +205,72 @@ sub update_order {
 
     my $txn = $db->txn_scope;
 
-    if ( $is_up ) {
-        my $itr = $db->search_by_sql( << "        ...", [ $ord + 1, $ord_prev ] );
-SELECT project_id, ord
-  FROM $table
-  WHERE ord BETWEEN ? AND ?
-    ORDER BY ord ASC
-        ...
-        $itr->suppress_object_creation(0);
-        while ( my $_row = $itr->next ) {
-            $_row->update({ ord => $_row->ord - 1 });
-        }
+    my ($rs, $itr, @select, @where);
+    @select = (
+        [qw/project_id/],
+        [qw/ord/],
+    );
+    @where = (
+        [qw/user_id/] => $user_id,
+    );
 
-        $db->update(
-            $table,
-            { ord => $ord_prev },
-            { project_id => $id },
+    if ( $is_up ) {
+        push @where, [qw/ord/] => { between => [ $ord, $ord_prev ] };
+
+        $rs = $db->resultset(
+            select => \@select,
+            from   => [ [qw/project/] ],
+            where  => \@where,
         );
+        $rs->add_order_by( $db->column(qw/ord/) => 'asc' );
+
+        $itr = $db->search_from_resultset($rs);
+        $itr->suppress_object_creation(1);
+
+        my (@_id, @_ord);
+        while ( my $_row = $itr->next ) {
+            push @_id,  $_row->{project_id};
+            push @_ord, $_row->{ord};
+        }
+        unshift @_ord, pop @_ord;  # 1,2,3,4,5 -> 5,1,2,3,4
+
+        while ( @_id ) {
+            my ($_id, $_ord) = ( shift(@_id), shift(@_ord) );
+            $db->update(
+                $table,
+                { ord => $_ord },
+                { project_id => $_id },
+            );
+        }
     }
     elsif ( $is_down ) {
-        my $itr = $db->search_by_sql( << "        ...", [ $ord_next, $ord - 1 ] );
-SELECT project_id, ord
-  FROM $table
-  WHERE ord BETWEEN ? AND ?
-    ORDER BY ord ASC
-        ...
-        $itr->suppress_object_creation(0);
-        while ( my $_row = $itr->next ) {
-            $_row->update({ ord => $_row->ord + 1 });
-        }
+        push @where, [qw/ord/] => { between => [ $ord_next, $ord ] };
 
-        $db->update(
-            $table,
-            { ord => $ord_next },
-            { project_id => $id },
+        $rs = $db->resultset(
+            select => \@select,
+            from   => [ [qw/project/] ],
+            where  => \@where,
         );
+        $rs->add_order_by( $db->column(qw/ord/) => 'asc' );
+
+        $itr = $db->search_from_resultset($rs);
+        $itr->suppress_object_creation(1);
+
+        my (@_id, @_ord);
+        while ( my $_row = $itr->next ) {
+            push @_id,  $_row->{project_id};
+            push @_ord, $_row->{ord};
+        }
+        push @_ord, shift @_ord;  # 1,2,3,4,5 -> 2,3,4,5,1
+
+        while ( @_id ) {
+            my ($_id, $_ord) = ( shift(@_id), shift(@_ord) );
+            $db->update(
+                $table,
+                { ord => $_ord },
+                { project_id => $_id },
+            );
+        }
     }
 
     $txn->commit;
