@@ -38,15 +38,22 @@
         update: function(ev, ui) {
           var $item_moved;
           $item_moved = ui.item;
+          $item_moved.removeClass('being_dragged');
           _this._update_item_order($item_moved);
           return true;
         },
         start: function(ev, ui) {
           var $item;
           $item = ui.item;
+          $item.addClass('being_dragged');
           return _this.$list.find('> li.sortable_placeholder').css({
             height: $item.height()
           });
+        },
+        stop: function(ev, ui) {
+          var $item;
+          $item = ui.item;
+          return $item.removeClass('being_dragged');
         }
       });
     };

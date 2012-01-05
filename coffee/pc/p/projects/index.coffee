@@ -34,12 +34,17 @@ class GTDme.Projects.Manager
                 placeholder: 'sortable_placeholder'
                 update: (ev, ui) =>
                     $item_moved = ui.item
+                    $item_moved.removeClass('being_dragged')
                     @_update_item_order($item_moved)
                     return true
                 start: (ev, ui) =>
                     $item = ui.item
+                    $item.addClass('being_dragged')
                     @$list.find('> li.sortable_placeholder').css
                         height:  $item.height()
+                stop: (ev, ui) =>
+                    $item = ui.item
+                    $item.removeClass('being_dragged')
             )
 
     _set_listener: ($item) ->

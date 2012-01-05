@@ -39,6 +39,10 @@
     background-color: #ffd8e9;
 }
 
+#projects > ul > li.being_dragged {
+    box-shadow: 2px 2px 8px #484848;
+}
+
 #projects ul li .main {
     padding: 4px;
     /* width: 33%; */
