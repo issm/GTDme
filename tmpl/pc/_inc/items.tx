@@ -197,6 +197,7 @@
         </div>
       </div>
 
+:   if ! $disable_menu.step {
       <div class="steps">
         <div class="rate_attain">
           <div class="rate_attain_content" style="width:{$i.rate_attain}%"></div>
@@ -212,6 +213,7 @@
         </div>
         <div class="clear"></div>
       </div>
+:   }
     </div>
 
     <div class="menu">
