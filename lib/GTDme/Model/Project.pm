@@ -183,6 +183,8 @@ sub update_order {
     my $db = $self->c->db;
     my $table = $db->table('project');
 
+    $self->_uniquifiy_order( user_id => $user_id );
+
     $db->suppress_row_objects(1);
 
     my ($row, $row_prev, $row_next);
@@ -245,8 +247,47 @@ SELECT project_id, ord
     return $ret;
 }
 
+sub _uniquifiy_order {
+    args (
+        my $self,
+        my $user_id => { isa => 'Int' },
+    );
+    my $db = $self->c->db;
+    my $table = $db->table('project');
 
+    my $is_unique = $db->search_by_sql(
+        << "        ...",
+SELECT IF(
+  ( SELECT COUNT(ord) FROM $table WHERE user_id = ? ) = ( SELECT COUNT(DISTINCT ord) FROM $table WHERE user_id = ? ),
+  1, 0
+) `check`
+        ...
+        [ $user_id, $user_id ],
+    )->next->{check} || 0;
 
+    return 0  if $is_unique;
+
+    my $itr = $db->search_by_sql(
+        << "        ...",
+SELECT project_id, ord
+  FROM $table
+  WHERE flg_del = 0
+    AND user_id = ?
+  ORDER BY ord ASC, project_id ASC
+        ...
+        [ $user_id ],
+    );
+
+    my $txn = $db->txn_scope;
+
+    my $order = 0;
+    while ( my $row = $itr->next ) {
+        $row->update({ ord => ++$order });
+    }
+
+    $txn->commit;
+    return 1;
+}
 
 
 1;
