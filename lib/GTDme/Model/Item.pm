@@ -42,6 +42,18 @@ sub search {
     my $ret = { count => 0, list => [], iterator => undef };
     my $db = $self->c->db;
     my ($rs, @select, @where, @join, $itr);
+    my @ids ;
+
+
+    if ( defined $tag ) {
+        @ids = $self->_ids_in_tag(
+            user_id    => $user_id,
+            tag        => $tag,
+            project_id => $project_id,
+            belongs    => $belongs,
+        );
+    }
+
 
     ### select
     @select = (
@@ -69,12 +81,6 @@ sub search {
         [qw/t_start -i_opt option_datetime_start/, sub { "FROM_UNIXTIME($_[1])" }],
         [qw/t_end   -i_opt option_datetime_end/,   sub { "FROM_UNIXTIME($_[1])" }],
     );
-    if ( defined $tag ) {
-        push @select, (
-            [qw/tag_id -t tag_id/],
-            [qw/name   -t tag_name/],
-        );
-    }
     if ( $with_datetime ) {
         push @select, (
             [qw/t_add   -i datetime_add/,  sub { "FROM_UNIXTIME($_[1])"}],
@@ -102,7 +108,9 @@ sub search {
         [qw/flg_del -i/] => 0,
     );
 
-    if ( defined $id )         { push @where, [qw/item_id    -i/] => $id }
+    if    ( defined $id ) { push @where, [qw/item_id -i/] => $id }
+    elsif ( @ids )        { push @where, [qw/item_id -i/] => \@ids }
+
     if ( defined $project_id ) { push @where, [qw/project_id -i/] => $project_id }
     if ( defined $belongs ) {
         # calendar_unclassified, calendar_theday, calendar_weekly, calendar_monthly
@@ -141,12 +149,6 @@ sub search {
         else {
             push @where, [qw/belongs -i/] => $belongs;
         }
-    }
-
-    if ( defined $tag ) {
-        push @where, (
-            [qw/name -t/] => $tag,
-        );
     }
 
     if ( $done )   { push @where, [qw/t_done -i/] => { '>' => 0 } }
@@ -240,6 +242,58 @@ sub search {
     }
 
     return $ret;
+}
+
+sub _ids_in_tag {
+    args (
+        my $self,
+        my $user_id    => { isa => 'Int' },
+        my $tag        => { isa => 'Str' },
+        my $project_id => { isa => 'Undef|Int', optional => 1 },
+        my $belongs    => { isa => 'Undef|Str', optional => 1 },
+    );
+    my @ret;
+    my $db = $self->c->db;
+    my ($rs, $itr, @where);
+
+    ### where
+    @where = (
+        [qw/user_id -t/] => $user_id,
+        [qw/name    -t/] => $tag,
+    );
+    push @where, [qw/project_id -i/] => $project_id  if defined $project_id;
+    push @where, [qw/belongs    -i/] => $belongs     if defined $belongs;
+
+    $rs = $db->resultset(
+        select => [
+            [qw/item_id -i2t/],
+        ],
+        where => \@where,
+        join => [
+            [qw/tag t/] => [
+                {
+                    table     => [qw/item_2_tag i2t/],
+                    type      => 'inner',
+                    condition => 'i2t.tag_id = t.tag_id',
+                },
+            ],
+            [qw/item_2_tag i2t/] => [
+                {
+                    table     => [qw/item i/],
+                    type      => 'inner',
+                    condition => 'i.item_id = i2t.item_id',
+                },
+            ],
+        ],
+    );
+
+    $itr = $db->search_from_resultset($rs);
+    $itr->suppress_object_creation(1);
+    while ( my $row = $itr->next ) {
+        push @ret, $row->{item_id};
+    }
+
+    return @ret;
 }
 
 
