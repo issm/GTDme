@@ -16,7 +16,7 @@ my %re = (
 +{
     'Teng' => {
         schema_class => 'GTDme::DB',
-        dsn          => 'dbi:mysql:gtdme:localhost',
+        dsn          => 'dbi:mysql:gtdme_dev:localhost',
         username     => '...',
         password     => '...',
 
@@ -31,7 +31,7 @@ my %re = (
     },
 
     'DBI' => [
-        "dbi:mysql:gtdme:localhost",
+        "dbi:mysql:gtdme_dev:localhost",
         '...',
         '...',
         +{}
