@@ -1,0 +1,122 @@
+#!/bin/sh
+
+MODE=$1
+
+ROOT=$(cd $(dirname $0)/../ && pwd)
+LOGDIR=$ROOT/log
+PIDFILE=$ROOT/var/run/server.pid
+STATUSFILE=$ROOT/var/run/server.status
+
+SERVER_PORT=5050
+
+PERL="/usr/bin/env perl"
+
+
+
+_main()
+{
+    ### env: PLACK_ENV
+    if [ "$PLACK_ENV" = "" ]; then
+        PLACK_ENV=development
+    fi
+
+    ### env: PERL_FNS_NO_OPT
+    if [ $(uname | awk '{print($1)}') = "Darwin" ]; then
+        PERL_FNS_NO_OPT=1
+    else
+        PERL_FNS_NO_OPT=0
+    fi
+
+    ###
+    case $MODE in
+        "start")
+            __start $*
+            ;;
+        "stop")
+            __stop
+            ;;
+        "restart")
+            __restart
+            ;;
+        * )
+            __start $*
+    esac
+    exit 0
+}
+
+__start() {
+    if [ -f $PIDFILE ]; then
+        echo server has been already started: pid  $(cat $PIDFILE)
+        exit 1
+    fi
+
+    PLACKUP_OPT_R=""
+    if [ "$PLACK_ENV" = "development" ]; then
+        PLACKUP_OPT_R="-R config"
+    fi
+
+    printf 'starting server...'
+
+    env \
+        PERL_FNS_NO_OPT=$PERL_FNS_NO_OPT \
+    start_server \
+        --interval=3 \
+        --port=$SERVER_PORT \
+        --pid-file=$ROOT/var/run/server.pid \
+        --status-file=$ROOT/var/run/server.status \
+        -- \
+    plackup \
+        -E $PLACK_ENV \
+        -s Starman \
+        --host=$HOST \
+        --port=$SERVER_PORT \
+        --workers 16 \
+        --max-requests 1000 \
+        --access-log $LOGDIR/access_log \
+        $PLACKUP_OPT_R \
+        $PSGI_FILE \
+        2>> $LOGDIR/error_log \
+        &
+
+    echo "...done."
+}
+
+__stop() {
+    if [ ! -f $PIDFILE ]; then
+        echo server is not running.
+        exit 1
+    fi
+
+    printf 'stopping server...'
+
+    kill -TERM $(cat $PIDFILE)
+
+    if [ -f $PIDFILE ]; then
+        rm $PIDFILE
+    fi
+
+    if [ -f $STATUSFILE ]; then
+        rm $STATUSFILE
+    fi
+
+    echo "...done."
+}
+
+__restart() {
+    if [ ! -f $PIDFILE ]; then
+        echo server is not running.
+        exit 1
+    fi
+
+    printf 'restarting server...'
+
+    start_server \
+        --restart \
+        --pid-file=$PIDFILE \
+        --status-file=$STATUSFILE
+
+    echo "...done."
+}
+
+
+_main $*
