@@ -16,6 +16,8 @@ my $router = router {
     connect '/item/update_order' => { controller => 'Root', action => 'item_update_order' }, { method => 'POST' };
     connect '/item/mark_done'    => { controller => 'Root', action => 'item_mark_done'    }, { method => 'POST' };
 
+    connect '/inbox/post'        => { controller => 'Root', action => 'inbox_post'        }, { method => 'POST' };
+
     connect '/project/list'         => { controller => 'Root', action => 'project_list'         }, { method => 'GET' };
     connect '/project/update'       => { controller => 'Root', action => 'project_update'       }, { method => 'POST' };
     connect '/project/update_order' => { controller => 'Root', action => 'project_update_order' }, { method => 'POST' };

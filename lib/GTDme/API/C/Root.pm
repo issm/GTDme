@@ -221,6 +221,15 @@ sub item_mark_done {
 
 
 
+### inbox
+
+sub inbox_post {
+    my $class = shift;
+    return $class->item_update(@_, belongs => 'inbox');
+}
+
+
+
 ### project
 
 sub project_list {
