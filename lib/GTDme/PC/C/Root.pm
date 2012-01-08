@@ -48,6 +48,7 @@ sub home_index {
     my $tag = Data::Recursive::Encode->decode_utf8( $c->{args}{tag} );
 
     my %params_search_item = (
+        undone        => 1,
         user_id       => $my->{id},
         belongs       => 'action',
         with_datetime => 1,
@@ -94,6 +95,7 @@ sub home_index_in_project {
     my $project_id = $c->{args}{project_id};
 
     my %params_search_item = (
+        undone        => 1,
         user_id       => $my->{id},
         project_id    => $project_id,
         belongs       => 'action',
