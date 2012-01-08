@@ -71,6 +71,7 @@ __PACKAGE__->add_trigger(
         }
         $c->stash->{my} = $my;
         $c->stash->{is_loggedin} = $my->{id} ? 1 : 0;
+        $c->stash->{is_deployment} = $ENV{PLACK_ENV} eq 'deployment' ? 1 : 0;
     },
 
 
