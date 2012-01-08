@@ -78,14 +78,14 @@ sub search {
         [qw/mday    -i_opt option_mday/],
         [qw/mwday   -i_opt option_mwday/],
 
-        [qw/t_start -i_opt option_datetime_start/, sub { "FROM_UNIXTIME($_[1])" }],
-        [qw/t_end   -i_opt option_datetime_end/,   sub { "FROM_UNIXTIME($_[1])" }],
+        [qw/t_start -i_opt option_datetime_start/, sub { "DATE_FORMAT( FROM_UNIXTIME($_[1]), '%Y-%m-%d %H:%i' )" }],
+        [qw/t_end   -i_opt option_datetime_end/,   sub { "DATE_FORMAT( FROM_UNIXTIME($_[1]), '%Y-%m-%d %H:%i' )" }],
     );
     if ( $with_datetime ) {
         push @select, (
-            [qw/t_add   -i datetime_add/,  sub { "FROM_UNIXTIME($_[1])"}],
-            [qw/t_up    -i datetime_up/,   sub { "FROM_UNIXTIME($_[1])"}],
-            [qw/t_done  -i datetime_done/, sub { "FROM_UNIXTIME($_[1])"}],
+            [qw/t_add   -i datetime_add/,  sub { "DATE_FORMAT( FROM_UNIXTIME($_[1]), '%Y-%m-%d %H:%i' )"}],
+            [qw/t_up    -i datetime_up/,   sub { "DATE_FORMAT( FROM_UNIXTIME($_[1]), '%Y-%m-%d %H:%i' )"}],
+            [qw/t_done  -i datetime_done/, sub { "DATE_FORMAT( FROM_UNIXTIME($_[1]), '%Y-%m-%d %H:%i' )"}],
         );
     }
     if ( $with_project ) {
