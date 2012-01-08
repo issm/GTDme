@@ -69,6 +69,7 @@ sub home_index {
     my $hit_project = $m_pr->search(
         user_id       => $my->{id},
         item_belongs  => 'action',
+        item_undone   => 1,
         with_iterator => 1,
     );
     my $hit_item = $m_item->search(%params_search_item);
@@ -118,6 +119,7 @@ sub home_index_in_project {
     my $hit_project = $m_pr->search(
         user_id       => $my->{id},
         item_belongs  => 'action',
+        item_undone   => 1,
         with_iterator => 1,
     );
     my $hit_item = $m_item->search(%params_search_item);
