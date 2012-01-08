@@ -22,6 +22,8 @@ sub search {
         my $undone        => { isa => 'Int', default => 0 },
 
         my $item_belongs  => { isa => 'Str', optional => 1 },
+        my $item_done     => { isa => 'Int', default => 0 },
+        my $item_undone   => { ids => 'Int', default => 0 },
 
         my $order_by_ord  => { isa => 'Str', optional => 1 },
 
@@ -57,10 +59,18 @@ sub search {
         );
     }
 
+    if ( $item_done ) {
+        push @where, [qw/t_done -i/] => { '>' => 0 };
+    }
+
+    if ( $item_undone ) {
+        push @where, [qw/t_done -i/] => 0;
+    }
+
     ### join
     @join = (
     );
-    if ( defined $item_belongs ) {
+    if ( defined $item_belongs  ||  $item_done  ||  $item_undone ) {
         push @join, (
             [qw/project pr/] => [
                 {
