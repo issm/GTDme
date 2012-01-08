@@ -58,7 +58,7 @@
     /*text-shadow: -1px -1px 1px #ddd;*/
 }
 #selector-project .body ul li a:hover {
-    color: #ff6789;
+    color: #ff4769;
     background-color: #ffe6ab;
 }
 

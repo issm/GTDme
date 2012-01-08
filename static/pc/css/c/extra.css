@@ -62,7 +62,7 @@
 #items ul li .main .options .wday,
 #items ul li .main .options .mday,
 #items ul li .main .options .mwday {
-    color: #ff6789;
+    color: #ff4769;
     font-size: 110%;
     font-weight: bolder;
 }
@@ -159,7 +159,7 @@
     font-weight: bolder;
 }
 #items ul li .main .steps .frac .step_attain_active {
-    color: #ff6789;
+    color: #ff4769;
 }
 
 #items ul li .main .steps .clear { clear: both }
