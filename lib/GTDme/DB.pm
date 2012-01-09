@@ -14,7 +14,7 @@ table {
         {name => 'ord', type => 4},
         {name => 't_up', type => 4},
         {name => 'content', type => 12},
-        {name => 'step_attain', type => 12},
+        {name => 'step_attain', type => 4},
         {name => 'item_id', type => 4},
         {name => 'step', type => 4},
         {name => 'flg_del', type => 4},
