@@ -64,6 +64,7 @@ sub search {
         [qw/content     -i/],
         [qw/step        -i/],
         [qw/step_attain -i/],
+        [qw/step_inc    -i/],
         [qw/step_attain -i rate_attain/, sub {
              my $c0 = $_[1];
              my $c1 = $db->column(qw/step -i/);
@@ -634,11 +635,55 @@ sub mark_done {
         { item_id => $id, user_id => $user_id, flg_del => 0 },
     );
     if ( defined $row ) {
-        my %params_up = (
-            t_done => $time,
-            t_up   => $time,
-        );
-        $params_up{t_done} = 0  if $revert;
+        my %params_up = do {
+            my %h = (
+                t_up => $time,
+            );
+
+            my $step_inc = $row->step_inc;
+
+            my $row_opt = $db->single(
+                $db->table('item_options'),
+                { item_id => $row->item_id },
+            );
+
+            ### weekly or monthly item
+            if (
+                defined $row_opt  &&
+                $row->belongs eq 'action'  &&
+                ( $row_opt->wday  ||  $row_opt->mday  ||  $row_opt->mwday )
+            ) {
+                $h{step}    = $row->step + $step_inc  if $step_inc;
+                ## to be moved to where belonged previous
+                # action -> calendar
+                $h{belongs} = 'calendar';
+            }
+            ### $step_inc != 0
+            elsif ( $step_inc ) {
+                $h{step} = $row->step + $step_inc;
+
+                ## to be moved to where belonged previous
+                # action -> project
+                if (
+                    $row->project_id > 0  &&
+                    $row->belongs eq 'action'
+                ) {
+                    $h{belongs} = 'project';
+                }
+                # action -> someday
+                elsif ( $row->belongs eq 'action' ) {
+                    $h{belongs} = 'someday';
+                }
+            }
+            ###
+            else {
+                $h{t_done} = $time;
+            }
+            $h{t_done} = 0  if $revert;
+
+            %h;
+        };
+
         $row->update( Data::Recursive::Encode->encode_utf8(\%params_up) );
         $ret = Data::Recursive::Encode->decode_utf8( $row->get_columns );
     }
