@@ -707,6 +707,7 @@ sub _split_content_options {
         | $conf->{weekly}
         | $conf->{monthly_date} | $conf->{monthly_wday}
         | $conf->{step}
+        | $conf->{step_inc}
     )$/x;
 
     my $i_content = first_index { $_ !~ $re_opts } @token;
@@ -735,7 +736,7 @@ sub _parse_content_options {
 
     my $conf = $self->c->config->{re_item_content_options};
 
-    my (@tag, @datetime, @weekly, @monthly_date, @monthly_wday, @step);
+    my (@tag, @datetime, @weekly, @monthly_date, @monthly_wday, @step, @step_inc);
 
     while ( my $i = shift @$options ) {
         # tag
@@ -788,6 +789,11 @@ sub _parse_content_options {
             push @step, $step;
             next;
         }
+        # step_inc
+        elsif ( my ($step_inc) = $i =~ qr/^$conf->{step_inc}$/ ) {
+            push @step_inc, $step_inc;
+            next;
+        }
     }
 
     $ret = +{
@@ -798,6 +804,7 @@ sub _parse_content_options {
         monthly_date => \@monthly_date,
         monthly_wday => \@monthly_wday,
         step         => \@step,
+        step_inc     => \@step_inc,
     };
 }
 
@@ -898,6 +905,14 @@ sub _update_content_options {
         $params_item{step_attain} = 0;
         if ( defined ( my $step = $options->{step}[0] ) ) {
             $params_item{step_attain} = $step;
+        }
+    };
+
+    ### step_inc
+    {
+        $params_item{step_inc} = 0;
+        if ( defined ( my $step_inc = $options->{step_inc}[0] ) ) {
+            $params_item{step_inc} = $step_inc;
         }
     };
 
