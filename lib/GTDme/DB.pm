@@ -11,6 +11,7 @@ table {
     pk 'item_id';
     columns (
         {name => 't_done', type => 4},
+        {name => 'step_inc', type => 4},
         {name => 'ord', type => 4},
         {name => 't_up', type => 4},
         {name => 'content', type => 12},
