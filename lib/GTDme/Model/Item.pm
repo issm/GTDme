@@ -26,6 +26,8 @@ sub search {
         my $belongs       => { isa => 'Str', optional => 1 },
         my $tag           => { isa => 'Str', optional => 1 },
 
+        my $is_action     => { isa => 'Int', optional => 1 },
+
         my $done          => { isa => 'Int', default => 0 },
         my $undone        => { isa => 'Int', default => 0 },
 
@@ -150,6 +152,10 @@ sub search {
         else {
             push @where, [qw/belongs -i/] => $belongs;
         }
+    }
+
+    if ( defined $is_action ) {
+        push @where, [qw/t_act -i/] => ( $is_action ? { '>' => 0 } : 0 );
     }
 
     if ( $done )   { push @where, [qw/t_done -i/] => { '>' => 0 } }
@@ -947,6 +953,42 @@ sub _update_content_options {
     }
 
     return $row_item_options;
+}
+
+
+
+sub to_action {
+    args (
+        my $self,
+        my $id      => { isa => 'Int' },
+        my $user_id => { isa => 'Int' },
+        my $belongs => { isa => 'Str' },
+    );
+    my $ret;
+    my $db = $self->c->db;
+    my $time = time;
+
+    my $row_item = $db->single(
+        $db->table('item'),
+        { item_id => $id, user_id => $user_id },
+    );
+    unless ( defined $row_item ) {
+        die;
+    }
+
+    my $txn = $db->txn_scope;
+
+    $belongs = 'action'  if $belongs eq 'inbox';
+
+    $row_item->update({
+        belongs => $belongs,
+        t_act   => $time,
+    });
+
+    $txn->commit;
+
+    $ret = Data::Recursive::Encode->decode_utf8( $row_item->get_columns );
+    return $ret;
 }
 
 
