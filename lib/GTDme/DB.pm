@@ -22,6 +22,7 @@ table {
         {name => 't_add', type => 4},
         {name => 'belongs', type => 12},
         {name => 'user_id', type => 4},
+        {name => 't_act', type => 4},
         {name => 'project_id', type => 4},
         {name => 'raw_text', type => 12},
     );
