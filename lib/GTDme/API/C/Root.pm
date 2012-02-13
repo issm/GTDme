@@ -38,7 +38,22 @@ sub item_update {
     try {
         my $m_item = $c->model('item');
         my ($up, $item);
-        if ( defined $belongs  &&  $belongs eq 'project'  &&  ! defined $project_id ) {
+        if ( defined $belongs  &&  $belongs eq 'action' ) {
+            $item = $m_item->search(
+                id            => $params_up{id},
+                user_id       => $params_up{user_id},
+                with_datetime => 1,
+                with_project  => 1,
+                with_tag      => 1,
+            )->{list}[0];
+
+            $up = $m_item->to_action(
+                id      => $params_up{id},
+                user_id => $params_up{user_id},
+                belongs => $item->{belongs},
+            );
+        }
+        elsif ( defined $belongs  &&  $belongs eq 'project'  &&  ! defined $project_id ) {
             ### port item to  project
             #$up = $m_item->update(%params_up);
             $up = $m_item->to_project(
