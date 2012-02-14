@@ -45,7 +45,7 @@ GTDme.ItemsFilteredBy.tag = '<: $tag :>';
 
 
 : include _inc::items {
-:   disable_menu    => { action => 1, calendar => 1, material => 1, background => 1, someday => 1, project => 1, trash => 1 },
+:   disable_menu    => { action => 1, calendar => 1, material => 1, background => 1, someday => 1, project => 1 },
 :   enable_sortable => 1,
 :   path_format     => { project => '/home/p/%s', tag => '/home/t/%s' },
 : }
