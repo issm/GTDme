@@ -61,17 +61,18 @@ sub home_index {
     $params_search_item{tag} = $tag  if defined $tag;
 
     my %params_search_tag = (
-        user_id       => $my->{id},
-        item_belongs  => 'action',
-        with_iterator => 1,
+        user_id        => $my->{id},
+        item_undone    => 1,
+        item_is_action => 1,
+        with_iterator  => 1,
     );
 
     my $hit_project = $m_pr->search(
-        user_id       => $my->{id},
-        item_belongs  => 'action',
-        item_undone   => 1,
-        order_by_ord  => 'asc',
-        with_iterator => 1,
+        user_id        => $my->{id},
+        item_undone    => 1,
+        item_is_action => 1,
+        order_by_ord   => 'asc',
+        with_iterator  => 1,
     );
     my $hit_item = $m_item->search(%params_search_item);
     my $hit_tag  = $m_tag->search(%params_search_tag);
@@ -97,10 +98,10 @@ sub home_index_in_project {
     my $project_id = $c->{args}{project_id};
 
     my %params_search_item = (
+        is_action     => 1,
         undone        => 1,
         user_id       => $my->{id},
         project_id    => $project_id,
-        belongs       => 'action',
         with_datetime => 1,
         with_project  => 1,
         with_tag      => 1,
@@ -113,6 +114,7 @@ sub home_index_in_project {
         user_id         => $my->{id},
         item_project_id => $project_id,
         item_belongs    => 'action',
+        item_is_action  => 1,
         with_iterator   => 1,
     );
 
@@ -147,6 +149,7 @@ sub inbox_index {
 
     my $tag = Data::Recursive::Encode->decode_utf8( $c->{args}{tag} );
     my %params_search = (
+        is_action     => 0,
         user_id       => $my->{id},
         belongs       => 'inbox',
         undone        => 1,
@@ -184,6 +187,7 @@ sub calendar_mode {
     my $tag  = Data::Recursive::Encode->decode_utf8( $c->{args}{tag} );
 
     my %params_search = (
+        is_action     => 0,
         user_id       => $my->{id},
         belongs       => 'calendar_' . $mode,
         undone        => 1,
@@ -215,6 +219,7 @@ sub background_index {
     my $tag  = Data::Recursive::Encode->decode_utf8( $c->{args}{tag} );
 
     my %params_search_item = (
+        is_action     => 0,
         user_id       => $my->{id},
         belongs       => 'background',
         undone        => 1,
@@ -227,9 +232,10 @@ sub background_index {
     $params_search_item{tag} = $tag  if defined $tag;
 
     my %params_search_tag = (
-        user_id       => $my->{id},
-        item_belongs  => 'background',
-        with_iterator => 1,
+        user_id        => $my->{id},
+        item_belongs   => 'background',
+        item_is_action => 0,
+        with_iterator  => 1,
     );
 
     my $hit_item = $m_item->search(%params_search_item);
@@ -254,6 +260,7 @@ sub materials_index {
     my $tag  = Data::Recursive::Encode->decode_utf8( $c->{args}{tag} );
 
     my %params_search_item = (
+        is_action     => 0,
         user_id       => $my->{id},
         belongs       => 'material',
         undone        => 1,
@@ -266,9 +273,10 @@ sub materials_index {
     $params_search_item{tag} = $tag  if defined $tag;
 
     my %params_search_tag = (
-        user_id       => $my->{id},
-        item_belongs  => 'material',
-        with_iterator => 1,
+        user_id        => $my->{id},
+        item_belongs   => 'material',
+        item_is_action => 0,
+        with_iterator  => 1,
     );
 
     my $hit_item = $m_item->search(%params_search_item);
@@ -292,6 +300,7 @@ sub someday_index {
     my ($m_item, $m_tag) = $c->model(qw/item tag/);
 
     my %params_search_item = (
+        is_action     => 0,
         user_id       => $my->{id},
         belongs       => 'someday',
         undone        => 1,
@@ -304,9 +313,10 @@ sub someday_index {
     $params_search_item{tag} = $tag  if defined $tag;
 
     my %params_search_tag = (
-        user_id       => $my->{id},
-        item_belongs  => 'someday',
-        with_iterator => 1,
+        user_id        => $my->{id},
+        item_belongs   => 'someday',
+        item_is_action => 0,
+        with_iterator  => 1,
     );
 
     my $hit_item = $m_item->search(%params_search_item);
@@ -363,6 +373,7 @@ sub projects_detail {
     }
 
     my %params_search_item = (
+        is_action     => 0,
         user_id       => $my->{id},
         project_id    => $project_id,
         belongs       => 'project',
