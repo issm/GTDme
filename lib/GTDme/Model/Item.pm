@@ -390,6 +390,7 @@ sub update {
         $h{content}     = $content      if defined $content;
         $h{belongs}     = $belongs      if defined $belongs;
         $h{step_attain} = $step_attain  if defined $project_id;
+        $h{t_act}       = 0             if defined $belongs  &&  $belongs eq 'trash';
         %h;
     };
     if ( defined $params_up{content} ) {
