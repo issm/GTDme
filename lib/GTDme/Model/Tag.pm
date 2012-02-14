@@ -16,8 +16,11 @@ sub search {
         my $id              => { isa => 'Int', optional => 1 },
         my $user_id         => { isa => 'Int' },
         my $name            => { isa => 'Str|Undef', optional => 1 },
+        my $item_is_action  => { isa => 'Int', optional => 1 },
         my $item_project_id => { isa => 'Int', optional => 1 },
         my $item_belongs    => { isa => 'Str', optional => 1 },
+        my $item_done       => { isa => 'Int', optional => 1 },
+        my $item_undone     => { isa => 'Int', optional => 1 },
 
         my $with_count      => { isa => 'Int', default => 0 },
         my $with_iterator   => { isa => 'Int', default => 0 },
@@ -40,12 +43,16 @@ sub search {
     push @where, [qw/tag_id -t/] => $id    if defined $id;
     push @where, [qw/name   -t/] => $name  if defined $name;
 
+    if ( defined $item_is_action ) {
+        push @where, [qw/t_act -i/] => ( $item_is_action ? { '>' => 0 } : 0 );
+    }
     push @where, [qw/project_id -i/] => $item_project_id  if defined $item_project_id;
     push @where, [qw/belongs -i/]    => $item_belongs     if defined $item_belongs;
-
+    push @where, [qw/t_done -i/] => { '>' => 0 }          if $item_done;
+    push @where, [qw/t_done -i/] => 0                     if $item_undone;
 
     ### join
-    if ( defined $item_project_id  ||  defined $item_belongs ) {
+    if ( defined $item_is_action  ||  defined $item_project_id  ||  defined $item_belongs ) {
         push @join, (
             [qw/tag t/] => [
                 {
