@@ -21,9 +21,10 @@ sub search {
         my $done          => { isa => 'Int', default => 0 },
         my $undone        => { isa => 'Int', default => 0 },
 
-        my $item_belongs  => { isa => 'Str', optional => 1 },
-        my $item_done     => { isa => 'Int', default => 0 },
-        my $item_undone   => { ids => 'Int', default => 0 },
+        my $item_is_action => { isa => 'Int', optional => 1 },
+        my $item_belongs   => { isa => 'Str', optional => 1 },
+        my $item_done      => { isa => 'Int', default => 0 },
+        my $item_undone    => { ids => 'Int', default => 0 },
 
         my $order_by_ord  => { isa => 'Str', optional => 1 },
 
@@ -52,6 +53,12 @@ sub search {
     push @where, [qw/project_id -pr/] => $id    if defined $id;
     push @where, [qw/code       -pr/] => $code  if defined $code;
     push @where, [qw/name       -pr/] => $name  if defined $name;
+
+    if ( defined $item_is_action ) {
+        push @where, (
+            [qw/t_act -i/] => ( $item_is_action ? { '>' => 0 } : 0 ),
+        );
+    }
 
     if ( defined $item_belongs ) {
         push @where, (
