@@ -657,30 +657,15 @@ sub mark_done {
             ### weekly or monthly item
             if (
                 defined $row_opt  &&
-                $row->belongs eq 'action'  &&
                 ( $row_opt->wday  ||  $row_opt->mday  ||  $row_opt->mwday )
             ) {
-                $h{step}    = $row->step + $step_inc  if $step_inc;
-                ## to be moved to where belonged previous
-                # action -> calendar
-                $h{belongs} = 'calendar';
+                $h{t_act} = 0;
+                $h{step}  = $row->step + $step_inc  if $step_inc;
             }
             ### $step_inc != 0
             elsif ( $step_inc ) {
-                $h{step} = $row->step + $step_inc;
-
-                ## to be moved to where belonged previous
-                # action -> project
-                if (
-                    $row->project_id > 0  &&
-                    $row->belongs eq 'action'
-                ) {
-                    $h{belongs} = 'project';
-                }
-                # action -> someday
-                elsif ( $row->belongs eq 'action' ) {
-                    $h{belongs} = 'someday';
-                }
+                $h{t_act} = 0;
+                $h{step}  = $row->step + $step_inc;
             }
             ###
             else {
