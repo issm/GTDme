@@ -12,24 +12,28 @@ use Plack::Util;
 use Plack::Session::Store::DBI;
 use Plack::Session::State::Cookie;
 use DBI;
+use Scope::Container;
 
 my $basedir = File::Spec->rel2abs(dirname(__FILE__));
 my $db_config = GTDme->config->{DBI} || die "Missing configuration for DBI";
-{
-    my $c = GTDme->new();
-    $c->setup_schema();
-}
 builder {
     enable 'Plack::Middleware::Static',
         path => qr{^(?:/robots\.txt|/favicon\.ico)$},
         root => File::Spec->catdir(dirname(__FILE__), 'static', 'pc');
     enable 'Plack::Middleware::ReverseProxy';
+    enable 'Plack::Middleware::Scope::Container';
     enable 'Plack::Middleware::Log::Minimal';
     enable 'Plack::Middleware::Session',
         store => Plack::Session::Store::DBI->new(
             get_dbh => sub {
-                DBI->connect( @$db_config )
-                    or die $DBI::errstr;
+                if ( my $dbh = scope_container('dbh') ) {
+                    return $dbh;
+                } else {
+                    my $dbh = DBI->connect( @$db_config )
+                        or die $DBI::errstr;
+                    scope_container('dbh', $dbh);
+                    return $dbh;
+                }
             }
         ),
         state => Plack::Session::State::Cookie->new(
