@@ -71,7 +71,7 @@ __start() {
         --host=$HOST \
         --port=$SERVER_PORT \
         --workers 16 \
-        --max-requests 1000 \
+        --max-requests 128 \
         --access-log $LOGDIR/access_log \
         $PLACKUP_OPT_R \
         $PSGI_FILE \
