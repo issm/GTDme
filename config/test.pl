@@ -34,7 +34,9 @@ my %re = (
         "dbi:mysql:gtdme_test:localhost",
         '...',
         '...',
-        +{}
+        +{
+            mysql_enable_utf8 => 1,
+        }
     ],
 
     'Text::Xslate' => {
