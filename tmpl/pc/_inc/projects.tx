@@ -30,7 +30,7 @@
 
 
 : # <!-- #projects -->
-<div class="span16" id="projects">
+<div class="span12" id="projects">
   <ul>
 : while $iterator_project.next() -> $i {
     <li id="projectss-item:<: $i.project_id :>" class="">

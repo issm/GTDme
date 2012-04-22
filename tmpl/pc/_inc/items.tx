@@ -3,7 +3,8 @@
 
 
 : # <!-- #items -->
-<div class="span16" id="items">
+<div class="row">
+<div class="span12" id="items">
   <ul>
 : while $iterator_item.next() -> $i {
     <li id="items-item:<: $i.item_id :>" class="">
@@ -55,8 +56,8 @@
             <input type="text" name="content" class="textbox" />
             <input type="hidden" name="raw_text" value="<: $i.raw_text :>" />
             <div class="actions">
-              <a class="button-cancel btn small">Cancel</a>
-              <a class="button-submit btn small primary">Save</a>
+              <a class="button-cancel btn btn-small">Cancel</a>
+              <a class="button-submit btn btn-small btn-primary">Save</a>
             </div>
           </div>
 
@@ -133,6 +134,7 @@
 : }
   </ul>
 </div>
+</div>
 : # <!-- /#items -->
 
 
@@ -192,8 +194,8 @@
         <input type="text" name="content" class="textbox" />
         <input type="hidden" name="raw_text" value="{$i.raw_text}" />
         <div class="actions">
-          <a class="button-cancel btn small">Cancel</a>
-          <a class="button-submit btn small primary">Save</a>
+          <a class="button-cancel btn btn-small">Cancel</a>
+          <a class="button-submit btn btn-small btn-primary">Save</a>
         </div>
       </div>
 

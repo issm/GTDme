@@ -42,8 +42,8 @@
               <input type="text" name="description" class="textbox textbox-description" value="<: $i.description :>" />
             </div>
             <div class="actions">
-              <a class="button-cancel btn small">Cancel</a>
-              <a class="button-submit btn small primary">Save</a>
+              <a class="button-cancel btn btn-small">Cancel</a>
+              <a class="button-submit btn btn-small btn-primary">Save</a>
             </div>
           </form>
         </div>

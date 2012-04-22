@@ -12,12 +12,12 @@
     <meta http-equiv="Content-Script-Type" content="text/javascript" />
     <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0"]]>
     <meta name="format-detection" content="telephone=no" />
-    <script src="<: uri_for('/static/js/jquery-1.7.1.min.js') :>"></script>
+    <script src="<: uri_for('/static/js/jquery-1.7.2.min.js') :>"></script>
     <script src="<: uri_for('/static/js/jquery-ui-1.8.16.custom.min.js') :>"></script>
-    <link href="<: uri_for('/static/bootstrap/bootstrap.min.css') :>" rel="stylesheet" type="text/css" />
+    <link href="<: uri_for('/static/bootstrap-2.0.2/css/bootstrap.min.css') :>" rel="stylesheet" type="text/css" />
+    <link href="<: uri_for('/static/bootstrap-2.0.2/css/bootstrap-responsive.min.css') :>" rel="stylesheet" type="text/css" />
 
-    <script src="<: uri_for('/static/bootstrap/bootstrap-dropdown.js') :>"></script>
-:#    <script src="<: uri_for('/static/bootstrap/bootstrap-modal.js') :>"></script>
+    <script src="<: uri_for('/static/bootstrap-2.0.2/js/bootstrap.min.js') :>"></script>
 
     <link href="<: static_file('/static/css/main.css') :>" rel="stylesheet" type="text/css" media="screen" />
     <link href="<: static_file('/static/css/c/base.css') :>" rel="stylesheet" type="text/css" media="screen" />
@@ -36,92 +36,93 @@ window.URL_BASE = '<: uri_for('/') :>';
     <![endif]-->
 </head>
 <body<: if $bodyID { :> id="<: $bodyID :>"<: } :>>
-    <div class="topbar-wrapper" style="z-index: 5;">
-        <div class="topbar" data-dropdown="dropdown">
-            <div class="topbar-inner">
-                <div class="container">
-                <h3><a href="<: uri_for('/') :>">GTDme</a></h3>
+  <!-- .navbar -->
+  <div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container">
+        <h1 class="brand"><a href="<: uri_for('/') :>">GTDme</a></h1>
 
 : if $is_loggedin {
-                <ul class="nav">
-                  <li class="<: if $navi_main.home  { :>active<: } :>"><a href="<: uri_for('/home/') :>">Home</a></li>
-                  <li class="<: if $navi_main.inbox { :>active<: } :>"><a href="<: uri_for('/inbox/') :>">Inbox</a></li>
-                  <li class="<: if $navi_main.calendar { :>active<: } :> dropdown">
-                    <a href="<: uri_for('/calendar/') :>" class="dropdown-toggle">Calendar</a>
-                    <ul class="dropdown-menu">
-                      <li><a href="<: uri_for('/calendar/theday') :>">the day</a></li>
-                      <li><a href="<: uri_for('/calendar/weekly') :>">weekly</a></li>
-                      <li><a href="<: uri_for('/calendar/monthly') :>">monthly</a></li>
-                      <li class="divider"></li>
-                      <li><a href="<: uri_for('/calendar/unclassified') :>">unclassified</a></li>
-                    </ul>
-                  </li>
-                  <li class="<: if $navi_main.background { :>active<: } :>"><a href="<: uri_for('/background/') :>">Background</a></li>
-                  <li class="<: if $navi_main.materials  { :>active<: } :>"><a href="<: uri_for('/materials/') :>">Materials</a></li>
-                  <li class="<: if $navi_main.someday    { :>active<: } :>"><a href="<: uri_for('/someday/') :>">Someday</a></li>
-                  <li class="<: if $navi_main.projects   { :>active<: } :>"><a href="<: uri_for('/projects/') :>">Projects</a></li>
-                </ul>
-:#                <form class="pull-left" action="">
-:#                  <input type="text" placeholder="Search">
-:#                </form>
-                <ul class="nav secondary-nav">
-                  <li class="dropdown">
-                    <a href="#" class="dropdown-toggle">
-                      <img src="http://api.twitter.com/1/users/profile_image/<: $my.nickname :>.json?size=mini" width="20" height="20" valign="middle" />
-                      <span style="margin-left:3px"><: $my.nickname :></span>
-                    </a>
-                    <ul class="dropdown-menu">
-                      <li><a href="<: uri_for('/my/trigger_list') :>">Trigger List</a></li>
-                      <li class="divider"></li>
-                      <li><a href="<: uri_for('/my/settings') :>">Settings</a></li>
-                      <li><a href="<: uri_for('/auth/logout') :>">Logout</a></li>
-                    </ul>
-                  </li>
-                </ul>
+        <ul class="nav">
+          <li class="<: if $navi_main.home  { :>active<: } :>"><a href="<: uri_for('/home/') :>">Home</a></li>
+          <li class="<: if $navi_main.inbox { :>active<: } :>"><a href="<: uri_for('/inbox/') :>">Inbox</a></li>
+          <li class="<: if $navi_main.calendar { :>active<: } :> dropdown">
+            <a  href="#" class="dropdown-toggle" data-toggle="dropdown">Calendar <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a href="<: uri_for('/calendar/theday') :>">the day</a></li>
+              <li><a href="<: uri_for('/calendar/weekly') :>">weekly</a></li>
+              <li><a href="<: uri_for('/calendar/monthly') :>">monthly</a></li>
+              <li class="divider"></li>
+              <li><a href="<: uri_for('/calendar/unclassified') :>">unclassified</a></li>
+            </ul>
+          </li>
+          <li class="<: if $navi_main.background { :>active<: } :>"><a href="<: uri_for('/background/') :>">Background</a></li>
+          <li class="<: if $navi_main.materials  { :>active<: } :>"><a href="<: uri_for('/materials/') :>">Materials</a></li>
+          <li class="<: if $navi_main.someday    { :>active<: } :>"><a href="<: uri_for('/someday/') :>">Someday</a></li>
+          <li class="<: if $navi_main.projects   { :>active<: } :>"><a href="<: uri_for('/projects/') :>">Projects</a></li>
+        </ul>
+
+        <ul class="nav pull-right">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <img src="http://api.twitter.com/1/users/profile_image/<: $my.nickname :>.json?size=mini" width="20" height="20" valign="middle" />
+              <span style="margin-left:3px"><: $my.nickname :></span>
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="<: uri_for('/my/trigger_list') :>">Trigger List</a></li>
+              <li class="divider"></li>
+              <li><a href="<: uri_for('/my/settings') :>">Settings</a></li>
+              <li><a href="<: uri_for('/auth/logout') :>">Logout</a></li>
+            </ul>
+          </li>
+        </ul>
 : } else {
-                <ul class="nav">
-                </ul>
-                <ul class="nav secondary-nav">
-                  <li class="dropdown">
-                    <a href="#" class="dropdown-toggle">guest</a>
-                    <ul class="dropdown-menu">
-                      <li><a href="<: uri_for('/auth/login/twitter') :>"><img src="<: uri_for('/static/img/sozai/sign-in-with-twitter-d.png') :>" /></a></li>
-                    </ul>
-                  </li>
-                </ul>
+        <ul class="nav">
+        </ul>
+        <ul class="nav pull-right">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              guest
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="<: uri_for('/auth/login/twitter') :>"><img src="<: uri_for('/static/img/sozai/sign-in-with-twitter-d.png') :>" /></a></li>
+            </ul>
+          </li>
+        </ul>
 : }
-                </div>
-            </div><!-- /topbar-inner -->
-        </div><!-- /topbar -->
+      </div>
     </div>
+  </div>
+  <!-- /.navbar -->
 
 
-
-    <div class="container">
-        <div id="main">
+  <div class="container">
+    <div id="main">
 : block content -> {}
-        </div>
-        <footer class="footer">
-            Powered by <a href="http://amon.64p.org/">Amon2</a>
-        </footer>
     </div>
+    <footer class="footer">
+      Powered by <a href="http://amon.64p.org/">Amon2</a>
+    </footer>
+  </div>
 
 
 : if $is_loggedin {
-    <div id="inbox-always-toggle">
-      <a href="#show_inbox_always">Add to Inbox?</a>
-    </div>
+  <div id="inbox-always-toggle">
+    <a href="#show_inbox_always">Add to Inbox?</a>
+  </div>
 
-    <div id="inbox-always">
-      <h3>Add to Inbox?</h3>
-      <form>
-        <input class="textbox" type="text" name="content" />
-        <div class="actions">
-          <a class="btn button-cancel">Cancel</a>
-          <a class="btn primary button-submit">Add</a>
-        </div>
-      </form>
-    </div>
+  <div id="inbox-always">
+    <h3>Add to Inbox?</h3>
+    <form>
+      <input class="textbox" type="text" name="content" />
+      <div class="actions">
+        <a class="btn button-cancel">Cancel</a>
+        <a class="btn btn-primary button-submit">Add</a>
+      </div>
+    </form>
+  </div>
 : }
 
 : include _inc::selectors {}

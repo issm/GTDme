@@ -30,7 +30,7 @@
 
 
 : # <!-- #tags -->
-<div class="span16" id="tags">
+<div class="span12" id="tags">
   <ul>
 : while $iterator_tag.next() -> $i {
     <li id="tags-item:<: $i.tag_id :>" class="">

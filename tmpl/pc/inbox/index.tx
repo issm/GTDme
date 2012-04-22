@@ -31,7 +31,7 @@
 
 
 : # <!-- #infox-form -->
-<div class="span160" id="inbox-form">
+<div id="inbox-form">
   <h3>Add to Inbox?</h3>
   <form>
     <input type="text" name="content" class="textbox" />
